@@ -1,0 +1,15 @@
+# Marble Project AI Rules (Antigravity & General Agents)
+
+## MANDATORY STARTUP PROTOCOL
+Every time you start a new session or take a new request, you MUST:
+1.  **READ** the project entry point: `MASTER_ONBOARDING.md`.
+2.  **SCAN** the local skill library: `.antigravity/index.md`.
+3.  **ACTIVATE** the relevant skills (e.g., `physics-defense`) based on the task context.
+
+## CORE CONSTRAINTS
+- **Technical Truth**: Always cross-reference `docs/API_SPEC.md` for signal and method signatures.
+- **Physics Stability**: You are FORBIDDEN from modifying CollisionPolygons without consulting `.antigravity/skills/physics-defense/SKILL.md`.
+- **Knowledge Persistence**: When finishing a task, you MUST follow the `handover-protocol` to sync technical documents in `docs/`.
+
+## DO NOT BLINDLY INFER
+If you are unsure about the architecture, use `view_file` on `docs/ARCHITECTURE.md`. Do not assume.

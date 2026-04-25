@@ -1,0 +1,15 @@
+# Godot-specific ignores
+**/ .godot/
+MarbleGame/.godot/
+MarbleGame/android/
+
+# OS-specific ignores
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+MarbleGame/build/
+
+# Temporary files
+*.tmp
+*.log

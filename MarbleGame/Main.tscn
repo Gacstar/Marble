@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://dsdljdxfjdm1k"]
+
+[ext_resource type="Script" uid="uid://cyn7qp8rwffty" path="res://Main.gd" id="1_main_script"]
+[ext_resource type="PackedScene" uid="uid://dpcpotwx2fbdh" path="res://MarbleTable.tscn" id="1_table"]
+[ext_resource type="PackedScene" uid="uid://dcdrjwxdredbb" path="res://CombatUI.tscn" id="2_combat_ui"]
+[ext_resource type="Script" uid="uid://ddg4p6ndi575h" path="res://CombatManager.gd" id="3_combat_manager"]
+
+[node name="Main" type="Node2D" unique_id=565695451]
+script = ExtResource("1_main_script")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1299075416]
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0.13, 0.13, 0.15, 1)
+metadata/_edit_lock_ = true
+
+[node name="MarbleTable" parent="." unique_id=1101216817 instance=ExtResource("1_table")]
+position = Vector2(652, 2)
+scale = Vector2(1.29, 1.29)
+
+[node name="CombatUI" parent="." unique_id=19034843 instance=ExtResource("2_combat_ui")]
+
+[node name="CombatManager" type="Node" parent="." unique_id=1582309115]
+script = ExtResource("3_combat_manager")
+hand_size = 4

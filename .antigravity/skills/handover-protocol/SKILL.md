@@ -23,6 +23,7 @@
 2.  **更新 Source of Truth**:
     - 如果新增了信號或方法，立即更新 `@/docs/API_SPEC.md`。
     - 如果調整了 UI 佈局，立即更新 `@/docs/ARCHITECTURE.md`。
+    - **若本次開發遇到重大技術障礙或地雷，立即更新 `@/docs/PITFALLS.md`。**
 3.  **生成日誌**: 在 `@/docs/logs/` (若存在) 記錄具體的 commit 級別變更摘要。
 
 ## 4. 常見坑洞 (Gotchas)

@@ -4,6 +4,11 @@
 
 ---
 
+## 🎮 遊戲設計與願景 (Game Design Document)
+遊戲的整體走向、規模、核心玩法與未來擴充藍圖。
+*(備註：AI 僅在「規劃新系統架構」時需要詳細閱讀此份文件，日常開發與除錯無需每次載入)*
+**[📂 docs/Marble_GDD/MOC_GDD.md](file:///d:/GodotProject/Marble/docs/Marble_GDD/MOC_GDD.md)**
+
 ## 🏗️ 核心架構 (Architecture)
 房子是怎麼蓋的？物理引擎為何選用 Box2D？
 **[📂 docs/ARCHITECTURE.md](file:///d:/GodotProject/Marble/docs/ARCHITECTURE.md)**

@@ -2,42 +2,31 @@
 
 本文件描述 Marble Table 的核心設計決策與物件連結方式，供 AI 快速理解「房子是怎麼蓋的」。
 
-## 1. 核心技術棧
-- **物理引擎:** `Box2D` (專為解決高速穿隧道問題導入)。
-- **開發頻率:** `60Hz`。
-- **CCD (連續碰撞偵測):** 全面開啟。
+## 1. 核心技術棧 (3D 轉型)
+- **渲染模式:** 混合 2D/3D。UI 保持 2D，遊戲桌面採用 **Native 3D**。
+- **物理引擎:** `Godot Physics 3D`。
+- **視覺風格:** 3D Toon Shader (卡通渲染)。使用 `next_pass` 頂點擴張法實作像素邊線。
+- **解析度/比例:** 3D 空間與 2D 座標採 `1:100` 換算 (PIXELS_PER_UNIT = 100)。
 
 ## 2. 物件組成 (Composition)
-專案不使用動態生成，所有物件皆為編輯器手動擺放的 `PackedScene`。
+專案已從純 2D 遷移至「視口嵌入式 3D」架構：
 
-- **`MarbleTable` (場景核心):** 負責物理物件容器（Pegs, Slots）與彈珠發射流程中的槽位擊中偵測。
-- **`CombatManager` (邏輯核心):** 負責戰鬥數值計算、牌堆循環 (Hand/Deck) 與怪物 CD 管理。
-- **`CombatUI` (顯示核心):** 負責玩家/怪物血條、卡牌圖選取與傷害視覺整合。
-- **`ScoreZone` (槽位):** 使用 `Area2D`。打中後發出 `slot_hit` 信號帶出索引，交由 `Main.gd` 轉交 `CombatManager` 結算。
+- **`MarblePerspectiveView` (視窗容器):** 使用 `SubViewportContainer` 承載 3D 世界。
+- **`SubViewport`:** 開啟 `physics_object_picking` 以支援滑鼠與 3D 物件互動。
+- **`MarbleTable3D` (3D 實體):** 取代舊版 2D Table。包含實體化的牆壁、釘子、拉桿與得分區。
+- **`CombatManager` (邏輯核心):** 保持不變，接收來自 3D 得分區的 `slot_hit` 信號。
+- **`Plunger3D`:** 3D 物理拉桿，支援滑鼠拖拽與彈性回彈。
+- **`ScoreZone3D`:** 3D 得分區偵測，進入後觸發技能並銷毀彈珠。
 
-## 3. 戰鬥與卡牌循環 (Combat & Deck System)
-- **佈局配置:** 
-    - **手牌區域:** 位於畫面左側，採用 `VBoxContainer` 垂直堆疊。
-    - **卡牌型態:** 橫向長條狀 (Horizontal Bar)，支援兩排技能標籤顯示。
-- **觸發機制:** 每當彈珠掉入槽位 $i$，`CombatManager` 讀取當前卡牌的 `slot_map[i]` 來決定觸發技能 A 或 B。
-- **技能類型 (五色標示):**
-    - **灰色 (Grey):** 一般傷害 A。
-    - **黃色 (Yellow):** 強力傷害 B。
-    - **綠色 (Green):** 回復 HP (Wolf 專屬)。
-    - **藍色 (Blue):** 延緩敵方 CD (Owl 專屬)。
-    - **紫色 (Purple):** 蓄力加倍 Buff (Dragon 專屬)。
-- **疊加與大招 (Ultimate):** 同一軌道進入第 5 顆彈珠時，效果翻倍並觸發「軌道清理」。
-- **循環模式:** 卡牌觸發後進入牌庫底，並從牌庫頂補充。
+## 3. 2D/3D 橋接機制 (The Bridge)
+- **輸入橋接:** `ViewportInputHandler.gd` 負責將 2D 螢幕座標透過 Raycast 轉換為 3D 互動，或透過 `physics_object_picking` 直接與 3D 碰撞體互動。
+- **信號橋接:** `Main.gd` 持有 `MarbleTable3D` 的引用，維持舊有的信號連接邏輯（如 `slot_hit`），確保 2D UI 與 3D 物理同步。
 
-## 4. 多怪物與目標選取 (Multi-Monster & Targeting)
-- **實作方式:** `CombatManager` 使用陣列管理多個怪物物件，且擁有一個全域的 `target_idx`。
-- **選取機制:** 玩家可透過點擊怪物組件切換目標，選中者顯示**紅色選取框**。
-- **死亡處理:** 血量歸 0 的怪物會停止冷卻計時並覆蓋灰色遮罩，攻擊邏輯自動跳過死亡對象。
-- **對象判定:** 
-    - 傷害性技能對準 `target_idx` 發動。
-    - 回復性技能固定作用於玩家。
+## 4. 卡通美學實作 (Toon Aesthetic)
+- **AdvancedToonShader:** 
+    - **Pass 1:** 自定義 `Light` 函數實作階梯光影 (Toon Shading)。
+    - **Pass 2 (Outline):** 使用 `next_pass` 配合 `cull_front` 實作可調寬度的物件邊線。
 
-## 5. 物理動態調整與穩定性 (Physics Stability)
-- **Box2D 限制:** 必須使用凸多邊形 (Convex)，頂點數上限為 8。
-- **繞線方向:** 所有 `CollisionPolygon2D` 強制使用逆時針 (CCW) 排序。
-- **轉角優化:** 複雜弧形改用多個簡單三角形/四邊形拼接，避免 `invalid_shape_handle` 報錯。
+## 5. 物理動態調整與穩定性
+- **邊界保護:** 設有隱形的「正面玻璃 (Front Glass)」防止彈珠在碰撞中彈出 Z 軸平面。
+- **軸向鎖定:** 彈珠 (`RigidBody3D`) 鎖定 Z 軸線性位移，確保其保持在 XY 平面運動。

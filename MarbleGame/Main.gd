@@ -1,6 +1,6 @@
 extends Node2D
 
-@onready var marble_table = $MarbleTable
+@onready var marble_table = $MarblePerspectiveView/SubViewport/WorldRoot/MarbleTable3D
 @onready var combat_ui = $CombatUI
 @onready var combat_manager = $CombatManager
 

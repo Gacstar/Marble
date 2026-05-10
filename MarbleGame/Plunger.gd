@@ -15,24 +15,26 @@ func _input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
-				var mouse_pos = get_global_mouse_position()
+				var mouse_pos = event.position
 				# Check if click is in the bottom-right corner control zone
 				if mouse_pos.x > 380 and mouse_pos.y > 550:
-					print("LOG: Global Drag Start at ", mouse_pos)
+					print("LOG: Plunger Drag Start at ", mouse_pos)
 					is_dragging = true
 					drag_start_y = mouse_pos.y
 			elif is_dragging:
 				release_plunger()
-
-func _process(_delta):
-	if is_dragging:
-		var current_mouse_y = get_global_mouse_position().y
+	
+	elif event is InputEventMouseMotion and is_dragging:
+		var current_mouse_y = event.position.y
 		var offset = max(0, current_mouse_y - drag_start_y)
 		head.position.y = default_y + min(offset, max_drag)
 		
 		# Feedback every few frames while dragging
 		if Engine.get_frames_drawn() % 60 == 0:
 			print("LOG: Current dragging offset: ", head.position.y - default_y)
+
+func _process(_delta):
+	pass # Logic moved to _input for better Viewport compatibility
 
 func release_plunger():
 	print("LOG: Plunger Released - Snap back!")

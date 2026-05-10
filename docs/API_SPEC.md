@@ -24,18 +24,26 @@
 - `skill_b_is_delay_cd`: 是否為延緩敵方 CD 技能 (Owl)。
 - `skill_b_is_damage_buff`: 是否為下回合雙倍傷害技能 (Dragon)。
 
-## MarbleTable.gd
+## MarbleTable3D.gd (3D 彈珠台管理器)
 ### 信號 (Signals)
-- `slot_hit(index: int)`: 當彈珠進入第 index 個槽位時發出。
+- `slot_hit(index: int)`: 當彈珠進入第 index 個 3D 得分區時發出。
 
 ### 函式 (Methods)
-- `update_slot_indicators(slot_map: Array[int])`: 同步槽位的指示燈顏色。
+- `clear_slot_marbles(slot_idx: int)`: [TODO] 清除 3D 空間中特定槽位的累積效果。
+- `update_slot_indicators(card: Resource)`: [TODO] 根據卡牌技能，動態變更 3D ScoreZone 的發光顏色。
+- `spawn_ball(force: float)`: 在拉桿位置生成一個具備衝量的 3D 彈珠。
 
-## CombatUI.gd
-### 函式 (Methods)
-- `update_ui(p_hp, p_max, m_data, t_idx, mult)`: 驅動全場 UI 刷新，含怪獸列表動態生成與卡牌倍率文字變色。
-- `show_damage_effect(target_name, amount)`: 顯示傷害日誌。
+## Plunger3D.gd (3D 拉桿)
+### 信號 (Signals)
+- `launched(force: float)`: 當玩家放開滑鼠時發出，帶出力道數值。
 
-## ScoreZone.gd
-### 函式 (Methods)
-- `set_indicator_color(color: Color)`: 根據卡牌技能類型直接變更洞口指示燈顏色。
+### 互動邏輯 (Interaction)
+- **拖拽偵測**: 透過 `_on_input_event` 偵測滑鼠點擊，並在 `_process` 中計算垂直拖拽位移。
+- **回彈動畫**: 使用 `Tween` 實作力道釋放後的彈性復位。
+
+## ScoreZone3D.gd (3D 得分偵測區)
+### 信號 (Signals)
+- `ball_entered(idx: int)`: 偵測到 3D 彈珠進入，回傳該洞口的索引。
+
+### 視覺狀態
+- **指示燈**: 包含一個半透明的 `MeshInstance3D`，用於顯示當前技能對應的洞口。

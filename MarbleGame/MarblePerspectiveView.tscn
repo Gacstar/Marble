@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://drq1dgjg0fsyc"]
+
+[ext_resource type="Script" uid="uid://dlsgvepa05mb3" path="res://ViewportInputHandler.gd" id="1"]
+[ext_resource type="PackedScene" path="res://MarbleTable3D.tscn" id="2"]
+
+[sub_resource type="Environment" id="3"]
+background_mode = 1
+background_color = Color(0.1, 0.1, 0.12, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+
+[sub_resource type="BoxShape3D" id="4"]
+size = Vector3(4.57, 8.14, 0.1)
+
+[node name="MarblePerspectiveView" type="SubViewportContainer" unique_id=1527083079]
+offset_right = 1920.0
+offset_bottom = 1080.0
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="." unique_id=1238172088]
+handle_input_locally = false
+physics_object_picking = true
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+
+[node name="WorldRoot" type="Node3D" parent="SubViewport" unique_id=1484762378]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewport/WorldRoot" unique_id=1012490163]
+environment = SubResource("3")
+
+[node name="MarbleTable3D" parent="SubViewport/WorldRoot" unique_id=1313030649 instance=ExtResource("2")]
+
+[node name="InputArea" type="Area3D" parent="SubViewport/WorldRoot" unique_id=953404723 node_paths=PackedStringArray("mesh")]
+script = ExtResource("1")
+mesh = NodePath("../MarbleTable3D/TableBase/MeshInstance3D")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SubViewport/WorldRoot/InputArea" unique_id=570852637]
+shape = SubResource("4")
+
+[node name="Camera3D" type="Camera3D" parent="SubViewport/WorldRoot" unique_id=482531127]
+transform = Transform3D(1, 0, 0, 0, 0.9590276, -0.28331265, 0, 0.28331265, 0.9590276, 0, -3.4240956, 10.975934)
+current = true
+fov = 45.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewport/WorldRoot" unique_id=412987194]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 5, 0)
+shadow_enabled = true

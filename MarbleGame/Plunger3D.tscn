@@ -1,0 +1,72 @@
+[gd_scene load_steps=6 format=3]
+
+[sub_resource type="GDScript" id="GDScript_v1"]
+script/source = "extends AnimatableBody3D
+
+signal launched(force)
+
+var is_dragging = false
+var drag_start_pos = Vector2()
+var current_pull = 0.0
+const MAX_PULL = 1.2
+
+@onready var initial_pos = position
+
+func _ready():
+	# 啟動輸入監測
+	input_ray_pickable = true
+	input_event.connect(_on_input_event)
+
+func _on_input_event(camera, event, pos, normal, shape_idx):
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				is_dragging = true
+				drag_start_pos = event.position
+			else:
+				if is_dragging:
+					launch()
+				is_dragging = false
+
+func _process(delta):
+	if is_dragging:
+		var mouse_pos = get_viewport().get_mouse_position()
+		# 簡單的垂直位移計算
+		var diff = (mouse_pos.y - drag_start_pos.y) / 100.0
+		current_pull = clamp(diff, 0, MAX_PULL)
+		position.y = initial_pos.y - current_pull
+
+func launch():
+	if current_pull > 0.1:
+		launched.emit(current_pull * 25.0)
+	
+	var tween = create_tween()
+	tween.tween_property(self, \"position:y\", initial_pos.y, 0.1).set_trans(Tween.TRANS_ELASTIC)
+	current_pull = 0.0
+"
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_v1"]
+top_radius = 0.1
+bottom_radius = 0.1
+height = 0.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v1"]
+albedo_color = Color(0.8, 0.2, 0.2, 1)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_v1"]
+top_radius = 0.1
+bottom_radius = 0.1
+height = 0.5
+
+[node name="Plunger3D" type="AnimatableBody3D"]
+collision_mask = 2
+script = SubResource("GDScript_v1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("CylinderMesh_v1")
+surface_material_override/0 = SubResource("StandardMaterial3D_v1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+shape = SubResource("CylinderShape3D_v1")

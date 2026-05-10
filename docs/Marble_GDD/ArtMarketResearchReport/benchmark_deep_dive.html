@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marble Project - 標竿遊戲深度調研報告</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --steam-btn: #171a21;
+            --gamalytic-btn: #4c6b22;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            line-height: 1.6;
+            padding: 60px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        .game-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+
+        .game-screenshot {
+            flex: 0 0 400px;
+            overflow: hidden;
+        }
+
+        .game-screenshot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .game-card:hover .game-screenshot img {
+            transform: scale(1.05);
+        }
+
+        .game-info {
+            padding: 30px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .game-header {
+            margin-bottom: 20px;
+        }
+
+        .game-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .game-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-item {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .country-tag {
+            display: inline-block;
+            background: #334155;
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-right: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .link-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-link {
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .btn-steam {
+            background-color: var(--steam-btn);
+            color: white;
+            border: 1px solid #334155;
+        }
+
+        .btn-steam:hover {
+            background-color: #2a3a4f;
+        }
+
+        .btn-gamalytic {
+            background-color: var(--gamalytic-btn);
+            color: white;
+        }
+
+        .btn-gamalytic:hover {
+            background-color: #5c812a;
+            box-shadow: 0 0 15px rgba(92, 129, 42, 0.4);
+        }
+
+        @media (max-width: 900px) {
+            .game-card {
+                flex-direction: column;
+            }
+            .game-screenshot {
+                flex: 0 0 250px;
+            }
+        }
+
+        .footer {
+            margin-top: 80px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>標竿遊戲深度調研報告</h1>
+        <p class="subtitle">針對指定六款核心對標作品之銷量、受眾與視覺分析</p>
+    </header>
+
+    <div class="game-grid">
+        <!-- Stardew Valley -->
+        <div class="game-card">
+            <div class="game-screenshot">
+                <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/413150/header.jpg" alt="Stardew Valley">
+            </div>
+            <div class="game-info">
+                <div class="game-header">
+                    <h2 class="game-title">Stardew Valley</h2>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">總銷量 (估算)</span>
+                            <span class="stat-value">2,960 萬份</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">國家分布前二</span>
+                            <div>
+                                <span class="country-tag">中國 (25.7%)</span>
+                                <span class="country-tag">美國 (18.7%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="link-group">
+                    <a href="https://store.steampowered.com/app/413150" target="_blank" class="btn-link btn-steam">Steam 頁面</a>
+                    <a href="https://gamalytic.com/game/413150" target="_blank" class="btn-link btn-gamalytic">Gamalytic 數據</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Peglin -->
+        <div class="game-card">
+            <div class="game-screenshot">
+                <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1296610/header.jpg" alt="Peglin">
+            </div>
+            <div class="game-info">
+                <div class="game-header">
+                    <h2 class="game-title">Peglin</h2>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">總銷量 (估算)</span>
+                            <span class="stat-value">936,400 份</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">國家分布前二</span>
+                            <div>
+                                <span class="country-tag">美國 (34.7%)</span>
+                                <span class="country-tag">中國 (12.6%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="link-group">
+                    <a href="https://store.steampowered.com/app/1296610" target="_blank" class="btn-link btn-steam">Steam 頁面</a>
+                    <a href="https://gamalytic.com/game/1296610" target="_blank" class="btn-link btn-gamalytic">Gamalytic 數據</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kingdom Rush Origins -->
+        <div class="game-card">
+            <div class="game-screenshot">
+                <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/816340/header.jpg" alt="Kingdom Rush Origins">
+            </div>
+            <div class="game-info">
+                <div class="game-header">
+                    <h2 class="game-title">Kingdom Rush Origins</h2>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">總銷量 (估算)</span>
+                            <span class="stat-value">587,900 份</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">國家分布前二</span>
+                            <div>
+                                <span class="country-tag">中國 (53.1%)</span>
+                                <span class="country-tag">美國 (8.6%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="link-group">
+                    <a href="https://store.steampowered.com/app/816340" target="_blank" class="btn-link btn-steam">Steam 頁面</a>
+                    <a href="https://gamalytic.com/game/816340" target="_blank" class="btn-link btn-gamalytic">Gamalytic 數據</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backpack Hero -->
+        <div class="game-card">
+            <div class="game-screenshot">
+                <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1970580/header.jpg" alt="Backpack Hero">
+            </div>
+            <div class="game-info">
+                <div class="game-header">
+                    <h2 class="game-title">Backpack Hero</h2>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">總銷量 (估算)</span>
+                            <span class="stat-value">566,900 份</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">國家分布前二</span>
+                            <div>
+                                <span class="country-tag">美國 (33.0%)</span>
+                                <span class="country-tag">中國 (15.3%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="link-group">
+                    <a href="https://store.steampowered.com/app/1970580" target="_blank" class="btn-link btn-steam">Steam 頁面</a>
+                    <a href="https://gamalytic.com/game/1970580" target="_blank" class="btn-link btn-gamalytic">Gamalytic 數據</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sea of Stars -->
+        <div class="game-card">
+            <div class="game-screenshot">
+                <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1244090/header.jpg" alt="Sea of Stars">
+            </div>
+            <div class="game-info">
+                <div class="game-header">
+                    <h2 class="game-title">Sea of Stars</h2>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">總銷量 (估算)</span>
+                            <span class="stat-value">400,500 份</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">國家分布前二</span>
+                            <div>
+                                <span class="country-tag">美國 (31.3%)</span>
+                                <span class="country-tag">巴西 (8.0%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="link-group">
+                    <a href="https://store.steampowered.com/app/1244090" target="_blank" class="btn-link btn-steam">Steam 頁面</a>
+                    <a href="https://gamalytic.com/game/1244090" target="_blank" class="btn-link btn-gamalytic">Gamalytic 數據</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dungeon Village -->
+        <div class="game-card">
+            <div class="game-screenshot">
+                <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1859360/header.jpg" alt="Dungeon Village">
+            </div>
+            <div class="game-info">
+                <div class="game-header">
+                    <h2 class="game-title">Dungeon Village</h2>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">總銷量 (估算)</span>
+                            <span class="stat-value">74,800 份</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">國家分布前二</span>
+                            <div>
+                                <span class="country-tag">中國 (34.3%)</span>
+                                <span class="country-tag">美國 (12.7%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="link-group">
+                    <a href="https://store.steampowered.com/app/1859360" target="_blank" class="btn-link btn-steam">Steam 頁面</a>
+                    <a href="https://gamalytic.com/game/1859360" target="_blank" class="btn-link btn-gamalytic">Gamalytic 數據</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 Marble Project | Benchmark Analysis Report</p>
+    </footer>
+</div>
+
+</body>
+</html>

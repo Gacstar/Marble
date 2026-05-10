@@ -1,0 +1,42 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="GDScript" id="GDScript_v1"]
+script/source = "extends Area3D
+
+signal ball_entered(idx)
+
+@export var slot_index: int = 0
+
+func _ready():
+	body_entered.connect(_on_body_entered)
+
+func _on_body_entered(body):
+	if body.name.begins_with(\"Ball3D\"):
+		ball_entered.emit(slot_index)
+		# 彈珠進洞後可以消失，或是執行其他邏輯
+		body.queue_free()
+"
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v1"]
+size = Vector3(0.4, 0.4, 0.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_v1"]
+size = Vector3(0.3, 0.1, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v1"]
+transparency = 1
+albedo_color = Color(0, 1, 0.5, 0.4)
+emission_enabled = true
+emission = Color(0, 1, 0.5, 1)
+
+[node name="ScoreZone3D" type="Area3D"]
+collision_mask = 2
+monitorable = false
+script = SubResource("GDScript_v1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_v1")
+surface_material_override/0 = SubResource("StandardMaterial3D_v1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_v1")

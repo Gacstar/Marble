@@ -3,7 +3,7 @@
 ## CORE PROTOCOL
 Upon session initialization, the Agent MUST:
 1.  **Read** `MASTER_ONBOARDING.md` to understand the project brain MOC.
-2.  **Read** `.antigravity/index.md` to identify valid skills.
+2.  **Read** `.agent/index.md` to identify valid skills.
 3.  **Cross-reference** `docs/API_SPEC.md` before ANY code generation.
 4.  **Consult** `docs/PITFALLS.md` immediately if errors occur, code fails to run, or behavior is unexpected.
 

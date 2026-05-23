@@ -82,4 +82,3 @@ func show_damage_effect(target: String, amount: int):
 		print("LOG: [HEAL] Player recovered ", amount, " HP!")
 	else:
 		print("LOG: [DAMAGE] ", target, " took ", amount, " damage!")
-

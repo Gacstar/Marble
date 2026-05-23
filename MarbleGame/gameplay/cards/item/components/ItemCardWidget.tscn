@@ -1,29 +1,29 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://dkuanyvgqqa4o"]
 
-[ext_resource type="Script" path="res://gameplay/cards/item/components/ItemCardWidget.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://cvvbn2b17kulf" path="res://gameplay/cards/item/components/ItemCardWidget.gd" id="1_script"]
 
-[node name="ItemCardWidget" type="PanelContainer"]
-custom_minimum_size = Vector2(200, 260)
+[node name="ItemCardWidget" type="PanelContainer" unique_id=1961900940]
+custom_minimum_size = Vector2(200, 100)
 offset_right = 200.0
-offset_bottom = 260.0
+offset_bottom = 140.0
 mouse_default_cursor_shape = 2
 script = ExtResource("1_script")
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="." unique_id=811964892]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
-mouse_filter = 2
 
-[node name="VBox" type="VBoxContainer" parent="Margin"]
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=406094990]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 5
 alignment = 1
 
-[node name="ItemName" type="Label" parent="Margin/VBox"]
+[node name="ItemName" type="Label" parent="Margin/VBox" unique_id=521773113]
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
@@ -31,15 +31,15 @@ theme_override_font_sizes/font_size = 18
 text = "Item Name"
 horizontal_alignment = 1
 
-[node name="Icon" type="TextureRect" parent="Margin/VBox"]
-custom_minimum_size = Vector2(100, 100)
+[node name="Icon" type="TextureRect" parent="Margin/VBox" unique_id=887383509]
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 size_flags_horizontal = 4
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CDLabel" type="Label" parent="Margin/VBox"]
+[node name="CDLabel" type="Label" parent="Margin/VBox" unique_id=321658268]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
@@ -48,7 +48,7 @@ theme_override_font_sizes/font_size = 24
 text = "CD: 3"
 horizontal_alignment = 1
 
-[node name="LockLabel" type="Label" parent="Margin/VBox"]
+[node name="LockLabel" type="Label" parent="Margin/VBox" unique_id=60928393]
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.8, 1, 1)
@@ -58,15 +58,14 @@ theme_override_font_sizes/font_size = 16
 text = "FROZEN (1)"
 horizontal_alignment = 1
 
-[node name="SelectionFrame" type="ReferenceRect" parent="."]
+[node name="SelectionFrame" type="ReferenceRect" parent="." unique_id=2099891600]
 visible = false
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/border_color = Color(1, 0.1, 0.1, 1)
 border_width = 4.0
 editor_only = false
 
-[node name="LockOverlay" type="ColorRect" parent="."]
+[node name="LockOverlay" type="ColorRect" parent="." unique_id=1413279521]
 visible = false
 layout_mode = 2
 mouse_filter = 2

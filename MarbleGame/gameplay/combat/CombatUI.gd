@@ -33,14 +33,21 @@ func initialize_cards(cards: Array[CardResource]):
 		food_card_widgets.append(widget)
 		widget.card_selected.connect(func(idx): card_selected_bubbled.emit(idx))
 
+var current_multiplier: int = 1
+
 func update_card_at_index(idx: int, new_card: CardResource):
 	if idx >= 0 and idx < current_hand.size():
 		current_hand[idx] = new_card
 
 func update_selection(selected_idx: int):
 	current_selected_card_idx = selected_idx
+	# 立即刷新所有手牌的選取外框狀態
+	for i in range(food_card_widgets.size()):
+		if i < current_hand.size():
+			food_card_widgets[i].setup(i, current_hand[i], i == current_selected_card_idx, current_multiplier)
 
 func update_ui(player_hp: int, p_max: int, enemy_data: Dictionary, item_cards_data: Array, target_item_idx: int, multiplier: int):
+	current_multiplier = multiplier
 	# 更新玩家 (老奶奶) HP UI
 	player_hp_bar.max_value = p_max
 	player_hp_bar.value = player_hp

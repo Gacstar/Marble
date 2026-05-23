@@ -19,9 +19,16 @@ func _on_input_event(_camera, event, position, _normal, _shape_idx):
 	# 將 3D 空間座標轉為 UV 座標 (0.0 到 1.0)
 	var local_pos = mesh.global_transform.affine_inverse() * position
 	
-	# QuadMesh 的預設大小是 1x1，中心在 0,0
-	# 所以座標範圍是 -0.5 到 0.5
-	var uv = Vector2(local_pos.x + 0.5, 0.5 - local_pos.y)
+	# 動態取得 QuadMesh 的大小 (此處為 4.57 x 8.14)
+	var mesh_size = Vector2(1.0, 1.0)
+	if mesh and mesh.mesh is QuadMesh:
+		mesh_size = mesh.mesh.size
+	
+	# 將座標範圍從 [-size/2, size/2] 映射到 [0, 1]
+	var uv = Vector2(
+		(local_pos.x / mesh_size.x) + 0.5,
+		0.5 - (local_pos.y / mesh_size.y)
+	)
 	
 	# 轉換為 Viewport 的像素座標
 	var viewport_pos = Vector2(

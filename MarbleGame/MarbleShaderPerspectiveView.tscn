@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://b5p3blr1nhgh8"]
+
+[ext_resource type="Script" uid="uid://crpm3fy5ahq63" path="res://MarbleShaderPerspectiveView.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://dpcpotwx2fbdh" path="res://MarbleTable.tscn" id="2"]
+[ext_resource type="Shader" uid="uid://bxs8o471453ov" path="res://perspective_warp.gdshader" id="3"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_warp"]
+shader = ExtResource("3")
+shader_parameter/top_left = Vector2(0.05, 0)
+shader_parameter/top_right = Vector2(0.95, 0)
+shader_parameter/bottom_left = Vector2(0, 1)
+shader_parameter/bottom_right = Vector2(1, 1)
+shader_parameter/antialiasing = 0.005
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_table"]
+viewport_path = NodePath("TableViewport")
+
+[node name="MarbleShaderPerspectiveView" type="ColorRect" unique_id=6561373]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="TableViewport" type="SubViewport" parent="." unique_id=575658210]
+disable_3d = true
+size = Vector2i(457, 854)
+render_target_update_mode = 4
+
+[node name="MarbleTable" parent="TableViewport" unique_id=1252504729 instance=ExtResource("2")]
+
+[node name="TableScreen" type="TextureRect" parent="." unique_id=1446914072]
+material = SubResource("ShaderMaterial_warp")
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -359.0
+offset_top = -508.0
+offset_right = 341.3125
+offset_bottom = 497.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("ViewportTexture_table")
+script = ExtResource("1")

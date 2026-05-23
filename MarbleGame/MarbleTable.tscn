@@ -14,11 +14,12 @@ script = ExtResource("1_script")
 
 [node name="Background" type="ColorRect" parent="." unique_id=2145282737]
 offset_right = 457.0
-offset_bottom = 814.0
+offset_bottom = 854.0
 mouse_filter = 2
 color = Color(0.95, 0.95, 0.9, 1)
 
 [node name="Walls" type="StaticBody2D" parent="." unique_id=778280357]
+position = Vector2(0, 40)
 
 [node name="LeftWall" type="CollisionPolygon2D" parent="Walls" unique_id=569247510]
 polygon = PackedVector2Array(-20, -20, 15, -20, 15, 834, -20, 834)
@@ -46,6 +47,7 @@ shape = SubResource("RectangleShape2D_o1atj")
 debug_color = Color(0.8768295, 0.30908513, 0.39564037, 0.41960785)
 
 [node name="Pegs" type="Node2D" parent="." unique_id=1354799925]
+position = Vector2(0, 40)
 
 [node name="Peg" parent="Pegs" unique_id=905974253 instance=ExtResource("3_peg")]
 position = Vector2(56, 240)
@@ -177,6 +179,7 @@ position = Vector2(366, 398)
 position = Vector2(23, 398)
 
 [node name="Slots" type="Node2D" parent="." unique_id=42969769]
+position = Vector2(0, 40)
 
 [node name="ScoreZone_Template" parent="Slots" unique_id=29082458 instance=ExtResource("5_scorezone")]
 position = Vector2(15, 679)
@@ -224,7 +227,7 @@ position = Vector2(334, 679)
 position = Vector2(328, 601)
 
 [node name="Plunger" parent="." unique_id=744513374 instance=ExtResource("2_plunger")]
-position = Vector2(424, 760)
+position = Vector2(424, 800)
 
 [node name="BallSpawnPoint" type="Marker2D" parent="." unique_id=1577577318]
-position = Vector2(424, 682)
+position = Vector2(424, 722)

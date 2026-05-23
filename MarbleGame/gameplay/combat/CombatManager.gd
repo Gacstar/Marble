@@ -1,6 +1,6 @@
 extends Node
 
-signal combat_updated(player_hp, player_max_hp, enemies_data, target_idx)
+signal combat_updated(player_hp, player_max_hp, active_enemy, item_cards, target_item_idx, next_damage_multiplier)
 signal enemy_attacked(enemy_name, damage)
 signal enemy_defeated(enemy_name)
 signal hand_initialized(hand)
@@ -13,8 +13,9 @@ signal enemy_selection_changed(idx)
 var player_max_hp = 100
 var player_hp = 100
 
-var enemies: Array[Dictionary] = []
-var target_enemy_idx: int = 0
+var active_enemy: Dictionary = {}
+var item_cards: Array[ItemCardResource] = []
+var target_item_idx: int = 0
 var next_damage_multiplier: int = 1
 
 var hand_cards: Array[CardResource] = []
@@ -37,10 +38,10 @@ func _initialize_all_cards():
 	var bear = _create_card("Bear", "bear_icon.jpg", 10, 11, [1, 1, 1, 1, 0, 0, 0, 0])
 	var tiger = _create_card("Tiger", "tiger_icon.jpg", 7, 14, [0, 1, 0, 1, 0, 1, 0, 1])
 	var dragon = _create_card("Dragon", "dragon_icon.jpg", 1, 0, [0, 0, 0, 0, 1, 0, 0, 0])
-	var phoenix = _create_card("Phoenix", "phoenix_icon.jpg", 5, 25, [1, 1, 0, 0, 0, 0, 1, 1])
+	var phoenix = _create_card("Phoenix", "dragon_icon.jpg", 5, 25, [1, 1, 0, 0, 0, 0, 1, 1])
 	
 	wolf.skill_b_is_heal = true
-	owl.skill_b_is_delay_cd = true
+	owl.skill_b_is_delay_cd = true # 代表延緩/封鎖
 	dragon.skill_b_is_damage_buff = true
 	
 	all_pool = [lion, eagle, wolf, owl, bear, tiger, dragon, phoenix]
@@ -54,7 +55,7 @@ func _initialize_all_cards():
 func _create_card(n, icon_name, a, b, slots) -> CardResource:
 	var c = CardResource.new()
 	c.animal_name = n
-	c.animal_icon = load("res://assets/" + icon_name)
+	c.animal_icon = load("res://assets/textures/" + icon_name)
 	c.skill_a_value = a
 	c.skill_b_value = b
 	c.slot_map.assign(slots as Array[int])
@@ -62,27 +63,45 @@ func _create_card(n, icon_name, a, b, slots) -> CardResource:
 
 func reset_combat():
 	player_hp = player_max_hp
-	enemies = [
-		{
-			"name": "Heavy Enemy A",
-			"icon": load("res://assets/textures/enemy_placeholder.jpg"),
-			"hp": 500,
-			"max_hp": 500,
-			"cd": 4,
-			"cd_default": 4,
-			"damage_range": Vector2i(20, 30)
-		},
-		{
-			"name": "Fast Enemy B",
-			"icon": load("res://assets/textures/enemy_placeholder.jpg"),
-			"hp": 150,
-			"max_hp": 150,
-			"cd": 1,
-			"cd_default": 1,
-			"damage_range": Vector2i(5, 10)
-		}
-	]
-	target_enemy_idx = 0
+	
+	active_enemy = {
+		"name": "Brat (奧客小鬼)",
+		"icon": load("res://assets/textures/enemy_placeholder.jpg"),
+		"hp": 300,
+		"max_hp": 300
+	}
+	
+	# 初始化敵方道具卡
+	var card1 = ItemCardResource.new()
+	card1.item_name = "Water Balloon (水球)"
+	card1.item_icon = load("res://assets/textures/owl_icon.jpg")
+	card1.cd_default = 3
+	card1.cd = 3
+	card1.skill_value = 15
+	card1.skill_type = "damage"
+	card1.lock_turns = 0
+	
+	var card2 = ItemCardResource.new()
+	card2.item_name = "Stink Bomb (臭彈)"
+	card2.item_icon = load("res://assets/textures/bear_icon.jpg")
+	card2.cd_default = 4
+	card2.cd = 4
+	card2.skill_value = 25
+	card2.skill_type = "damage"
+	card2.lock_turns = 0
+	
+	var card3 = ItemCardResource.new()
+	card3.item_name = "Screaming (尖叫)"
+	card3.item_icon = load("res://assets/textures/tiger_icon.jpg")
+	card3.cd_default = 2
+	card3.cd = 2
+	card3.skill_value = 8
+	card3.skill_type = "damage"
+	card3.lock_turns = 0
+	
+	item_cards = [card1, card2, card3]
+	
+	target_item_idx = 0
 	next_damage_multiplier = 1
 	emit_combat_signal()
 
@@ -92,11 +111,10 @@ func select_card(idx: int):
 		selection_changed.emit(idx)
 
 func select_enemy(idx: int):
-	if idx >= 0 and idx < enemies.size():
-		if enemies[idx].hp > 0:
-			target_enemy_idx = idx
-			enemy_selection_changed.emit(idx)
-			emit_combat_signal()
+	if idx >= 0 and idx < item_cards.size():
+		target_item_idx = idx
+		enemy_selection_changed.emit(idx)
+		emit_combat_signal()
 
 func trigger_skill_from_slot(slot_index: int):
 	var card = hand_cards[selected_hand_idx]
@@ -111,26 +129,25 @@ func trigger_skill_from_slot(slot_index: int):
 		clear_slot_requested.emit(slot_index)
 		slot_counts[slot_index] = 0
 	
-	var target = enemies[target_enemy_idx]
-	
 	if is_skill_b and card.skill_b_is_heal:
 		player_hp += value
 		if player_hp > player_max_hp: player_hp = player_max_hp
 		player_healed.emit(value)
 	elif is_skill_b and card.skill_b_is_delay_cd:
-		target.cd += value
-		print("LOG: DELAY CD of ", target.name, " by ", value)
+		if target_item_idx >= 0 and target_item_idx < item_cards.size():
+			var target_item = item_cards[target_item_idx]
+			target_item.lock_turns += value
+			print("LOG: [LOCK] ", target_item.item_name, " is frozen for ", value, " turns.")
 	elif is_skill_b and card.skill_b_is_damage_buff:
 		next_damage_multiplier = 2
 		print("LOG: NEXT DAMAGE DOUBLED!")
 	else:
 		# 執行傷害
 		var damage = value * next_damage_multiplier
-		target.hp -= damage
-		if target.hp <= 0:
-			target.hp = 0
-			enemy_defeated.emit(target.name)
-			_auto_select_next_target()
+		active_enemy.hp -= damage
+		if active_enemy.hp <= 0:
+			active_enemy.hp = 0
+			enemy_defeated.emit(active_enemy.name)
 		
 		# 傷害觸發後重置倍率
 		next_damage_multiplier = 1
@@ -138,13 +155,6 @@ func trigger_skill_from_slot(slot_index: int):
 	_swap_active_card()
 	enemy_turn_tick()
 	emit_combat_signal()
-
-func _auto_select_next_target():
-	for i in range(enemies.size()):
-		if enemies[i].hp > 0:
-			target_enemy_idx = i
-			enemy_selection_changed.emit(i)
-			return
 
 func _swap_active_card():
 	var used_card = hand_cards[selected_hand_idx]
@@ -154,16 +164,22 @@ func _swap_active_card():
 	card_swapped.emit(selected_hand_idx, new_card)
 
 func enemy_turn_tick():
-	for m in enemies:
-		if m.hp <= 0: continue
+	if active_enemy.hp <= 0:
+		return
 		
-		m.cd -= 1
-		if m.cd <= 0:
-			var damage = randi_range(m.damage_range.x, m.damage_range.y)
+	for card in item_cards:
+		if card.lock_turns > 0:
+			card.lock_turns -= 1
+			print("LOG: [LOCK_TICK] ", card.item_name, " remaining frozen turns: ", card.lock_turns)
+			continue
+			
+		card.cd -= 1
+		if card.cd <= 0:
+			var damage = card.skill_value
 			player_hp -= damage
 			if player_hp < 0: player_hp = 0
-			m.cd = m.cd_default
-			enemy_attacked.emit(m.name, damage)
+			card.cd = card.cd_default
+			enemy_attacked.emit(card.item_name, damage)
 
 func emit_combat_signal():
-	combat_updated.emit(player_hp, player_max_hp, enemies, target_enemy_idx, next_damage_multiplier)
+	combat_updated.emit(player_hp, player_max_hp, active_enemy, item_cards, target_item_idx, next_damage_multiplier)

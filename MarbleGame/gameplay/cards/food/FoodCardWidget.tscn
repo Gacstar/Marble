@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://cu7rga4tgdfyu"]
 
-[ext_resource type="Script" uid="uid://dx1c44yemspnm" path="res://gameplay/cards/components/CardWidget.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://dx1c44yemspnm" path="res://gameplay/cards/food/FoodFoodFoodCardWidget.gd" id="1_script"]
 
-[node name="CardWidget" type="PanelContainer" unique_id=175552471]
+[node name="FoodFoodCardWidget" type="PanelContainer" unique_id=175552471]
 custom_minimum_size = Vector2(300, 100)
 offset_right = 300.0
 offset_bottom = 100.0

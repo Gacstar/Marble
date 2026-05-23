@@ -16,9 +16,6 @@ func _gui_input(event: InputEvent):
 		# 2. 將相對滑鼠位置轉為 0~1 的相對座標 (screen UV)
 		var screen_uv = event.position / container_size
 		
-		# 3. 將 UV 移到中心點 [-0.5, 0.5]
-		var uv_centered = screen_uv - Vector2(0.5, 0.5)
-		
 		# 4. 從材質中動態獲取 4 角座標
 		var top_left = Vector2(0.0, 0.0)
 		var top_right = Vector2(1.0, 0.0)
@@ -26,14 +23,14 @@ func _gui_input(event: InputEvent):
 		var bottom_right = Vector2(1.0, 1.0)
 		
 		if material and material is ShaderMaterial:
-			var tl = material.get_shader_parameter("top_left")
-			var tr = material.get_shader_parameter("top_right")
-			var bl = material.get_shader_parameter("bottom_left")
-			var br = material.get_shader_parameter("bottom_right")
-			if tl != null: top_left = tl
-			if tr != null: top_right = tr
-			if bl != null: bottom_left = bl
-			if br != null: bottom_right = br
+			var p_tl = material.get_shader_parameter("top_left")
+			var p_tr = material.get_shader_parameter("top_right")
+			var p_bl = material.get_shader_parameter("bottom_left")
+			var p_br = material.get_shader_parameter("bottom_right")
+			if p_tl != null: top_left = p_tl
+			if p_tr != null: top_right = p_tr
+			if p_bl != null: bottom_left = p_bl
+			if p_br != null: bottom_right = p_br
 			
 		# 5. 計算前向投影矩陣 H 的係數
 		var x0 = top_left.x;     var y0 = top_left.y

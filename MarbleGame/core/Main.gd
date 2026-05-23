@@ -32,8 +32,8 @@ func _ready():
 func _on_slot_hit(slot_idx):
 	combat_manager.trigger_skill_from_slot(slot_idx)
 
-func _on_combat_updated(p_hp, p_max, m_data, t_idx, mult):
-	combat_ui.update_ui(p_hp, p_max, m_data, t_idx, mult)
+func _on_combat_updated(p_hp, p_max, active_enemy, item_cards, t_idx, mult):
+	combat_ui.update_ui(p_hp, p_max, active_enemy, item_cards, t_idx, mult)
 
 func _on_enemy_attacked(m_name, dmg):
 	combat_ui.show_damage_effect(m_name, dmg)

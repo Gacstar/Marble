@@ -1,0 +1,117 @@
+[gd_scene format=3 uid="uid://dcdrjwxdredbb"]
+
+[ext_resource type="Script" uid="uid://bbo55pst154p5" path="res://gameplay/combat/CombatUI.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://coyvs4qwm6qxc" path="res://assets/textures/cat_player.jpg" id="2_cat"]
+[ext_resource type="Texture2D" uid="uid://3f6lx4kegaco" path="res://assets/textures/enemy_placeholder.jpg" id="3_monster"]
+
+[node name="CombatUI" type="CanvasLayer" unique_id=1445871488]
+script = ExtResource("1_script")
+
+[node name="PlayerSide" type="Control" parent="." unique_id=1800319716]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 80.0
+offset_top = 100.0
+offset_right = 430.0
+offset_bottom = 750.0
+
+[node name="CatSprite" type="TextureRect" parent="PlayerSide" unique_id=74768310]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -128.0
+offset_right = 128.0
+offset_bottom = 256.0
+grow_horizontal = 2
+texture = ExtResource("2_cat")
+expand_mode = 1
+stretch_mode = 5
+flip_h = true
+
+[node name="ProgressBar" type="ProgressBar" parent="PlayerSide" unique_id=1804972826]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -369.0
+offset_right = 150.0
+offset_bottom = -339.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.9490196, 1, 0.9490196, 1)
+theme_override_font_sizes/font_size = 18
+value = 100.0
+
+[node name="HPLabel" type="Label" parent="PlayerSide" unique_id=2001515597]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -328.0
+offset_right = 150.0
+offset_bottom = -300.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 20
+text = "HP: 100 / 100"
+horizontal_alignment = 1
+
+[node name="PlayerName" type="Label" parent="PlayerSide" unique_id=543408116]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -50.0
+offset_top = -40.0
+offset_right = 50.0
+offset_bottom = -14.0
+grow_horizontal = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+text = "Player (Cat)"
+horizontal_alignment = 1
+
+[node name="CardHand" type="VBoxContainer" parent="PlayerSide" unique_id=1999927464]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -147.0
+offset_right = 150.0
+offset_bottom = 193.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="EnemySide" type="Control" parent="." unique_id=1056639596]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -600.0
+offset_top = 100.0
+offset_right = -100.0
+offset_bottom = 500.0
+grow_horizontal = 0
+
+[node name="EnemyContainer" type="HBoxContainer" parent="EnemySide" unique_id=1337]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 2

@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://bfwcuinu8tejy"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_v1"]
+radius = 0.15
+height = 0.3
+
+[sub_resource type="Shader" id="Shader_outline"]
+code = "shader_type spatial;
+render_mode unshaded, cull_front;
+uniform vec4 outline_color : source_color = vec4(0, 0, 0, 1);
+uniform float outline_width : hint_range(0, 1) = 0.05;
+void vertex() {
+	VERTEX += NORMAL * outline_width;
+}
+void fragment() {
+	ALBEDO = outline_color.rgb;
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_outline"]
+render_priority = -1
+shader = SubResource("Shader_outline")
+shader_parameter/outline_color = Color(0, 0, 0, 1)
+shader_parameter/outline_width = 0.03
+
+[sub_resource type="Shader" id="Shader_advanced"]
+code = "shader_type spatial;
+render_mode diffuse_toon, specular_toon;
+uniform vec4 albedo : source_color = vec4(1.0, 0.4, 0.4, 1.0);
+uniform vec4 shadow_color : source_color = vec4(0.5, 0.2, 0.2, 1.0);
+uniform float shadow_threshold : hint_range(0.0, 1.0) = 0.5;
+uniform float shadow_softness : hint_range(0.0, 1.0) = 0.05;
+void fragment() {
+	ALBEDO = albedo.rgb;
+}
+void light() {
+	float dot_nl = dot(NORMAL, LIGHT);
+	float shadow = smoothstep(shadow_threshold - shadow_softness, shadow_threshold + shadow_softness, dot_nl);
+	vec3 final_color = mix(shadow_color.rgb, LIGHT_COLOR, shadow);
+	DIFFUSE_LIGHT += final_color * ATTENUATION * ALBEDO;
+	float specular = pow(max(dot(reflect(-LIGHT, NORMAL), VIEW), 0.0), 32.0);
+	SPECULAR_LIGHT += vec3(specular) * shadow * LIGHT_COLOR;
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ball"]
+render_priority = 0
+next_pass = SubResource("ShaderMaterial_outline")
+shader = SubResource("Shader_advanced")
+shader_parameter/albedo = Color(0.2, 0.6, 1, 1)
+shader_parameter/shadow_color = Color(0.1, 0.3, 0.5, 1)
+shader_parameter/shadow_threshold = 0.5
+shader_parameter/shadow_softness = 0.05
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_v1"]
+radius = 0.15
+
+[node name="Ball3D" type="RigidBody3D" unique_id=844786968]
+collision_layer = 2
+collision_mask = 3
+axis_lock_linear_z = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1123384952]
+mesh = SubResource("SphereMesh_v1")
+surface_material_override/0 = SubResource("ShaderMaterial_ball")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1775598214]
+shape = SubResource("SphereShape3D_v1")

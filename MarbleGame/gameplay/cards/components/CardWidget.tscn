@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://cu7rga4tgdfyu"]
+
+[ext_resource type="Script" uid="uid://dx1c44yemspnm" path="res://gameplay/cards/components/CardWidget.gd" id="1_script"]
+
+[node name="CardWidget" type="PanelContainer" unique_id=175552471]
+custom_minimum_size = Vector2(300, 100)
+offset_right = 300.0
+offset_bottom = 100.0
+mouse_default_cursor_shape = 2
+script = ExtResource("1_script")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=143521872]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 5
+
+[node name="HBox" type="HBoxContainer" parent="Margin" unique_id=1874073689]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 15
+
+[node name="Icon" type="TextureRect" parent="Margin/HBox" unique_id=1496325368]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InfoVBox" type="VBoxContainer" parent="Margin/HBox" unique_id=261098377]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="AnimalName" type="Label" parent="Margin/HBox/InfoVBox" unique_id=1886240580]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 16
+text = "Animal Name"
+
+[node name="SkillALayout" type="HBoxContainer" parent="Margin/HBox/InfoVBox" unique_id=1267707756]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="LightA" type="ColorRect" parent="Margin/HBox/InfoVBox/SkillALayout" unique_id=1070669057]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_vertical = 4
+color = Color(1, 0.4, 0.2, 1)
+
+[node name="SkillA" type="Label" parent="Margin/HBox/InfoVBox/SkillALayout" unique_id=875771350]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "[攻擊] A: 5"
+
+[node name="SkillBLayout" type="HBoxContainer" parent="Margin/HBox/InfoVBox" unique_id=1491310098]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="LightB" type="ColorRect" parent="Margin/HBox/InfoVBox/SkillBLayout" unique_id=1865766563]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_vertical = 4
+color = Color(0.2, 0.8, 0.3, 1)
+
+[node name="SkillB" type="Label" parent="Margin/HBox/InfoVBox/SkillBLayout" unique_id=991228439]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "[回復] HP+15"
+
+[node name="ColorMap" type="HBoxContainer" parent="Margin/HBox/InfoVBox" unique_id=1985176425]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]

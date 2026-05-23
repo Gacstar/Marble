@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://cy8j8j8j8j8j8"]
+
+[ext_resource type="Script" uid="uid://be1twomkgkhap" path="res://gameplay/table/components/Ball.gd" id="1_script"]
+
+[ext_resource type="Texture2D" uid="uid://dnbpwnnly6tca" path="res://assets/textures/cartoon_marble.png" id="2_texture"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_1"]
+friction = 0.1
+bounce = 0.5
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 15.0
+
+[node name="Ball" type="RigidBody2D" unique_id=1049678232]
+physics_material_override = SubResource("PhysicsMaterial_1")
+continuous_cd = 2
+script = ExtResource("1_script")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id="sprite_2d_ball"]
+texture = ExtResource("2_texture")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1531556614]
+shape = SubResource("CircleShape2D_1")

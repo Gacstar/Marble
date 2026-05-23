@@ -13,3 +13,6 @@ MarbleGame/build/
 # Temporary files
 *.tmp
 *.log
+
+# Exclude heavy artwork files and reference media
+ArtWork/

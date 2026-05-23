@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://bl31rgm0q0c8h"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_p3x2n"]
+radius = 6.0
+
+[node name="Peg" type="StaticBody2D" unique_id=1015317804]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1893544713]
+shape = SubResource("CircleShape2D_p3x2n")
+
+[node name="Polygon2D" type="Polygon2D" parent="." unique_id=2052728984]
+scale = Vector2(1.5, 1.5)
+color = Color(0.39427707, 0.15285125, 0.5838225, 1)
+polygon = PackedVector2Array(4, 0, 2.828, 2.828, 0, 4, -2.828, 2.828, -4, 0, -2.828, -2.828, 0, -4, 2.828, -2.828)

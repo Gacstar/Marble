@@ -1,15 +1,64 @@
-# Marble Project AI Rules (Antigravity & General Agents)
+# 🔮 Gacstar/Marble Project Rules & Codebase Architecture Guidelines
 
-## MANDATORY STARTUP PROTOCOL
-Every time you start a new session or take a new request, you MUST:
-1.  **READ** the project entry point: `MASTER_ONBOARDING.md`.
-2.  **SCAN** the local skill library: `.antigravity/index.md`.
-3.  **ACTIVATE** the relevant skills (e.g., `physics-defense`) based on the task context.
+這是本專案（夜市彈珠卡牌遊戲 Marble）的核心開發與檔案擺放準則。不論是 AI 助理還是人類協作者，在新增、修改、搬移任何檔案時，必須 100% 嚴格遵守本規則。
 
-## CORE CONSTRAINTS
-- **Technical Truth**: Always cross-reference `docs/API_SPEC.md` for signal and method signatures.
-- **Physics Stability**: You are FORBIDDEN from modifying CollisionPolygons without consulting `.antigravity/skills/physics-defense/SKILL.md`.
-- **Knowledge Persistence**: When finishing a task, you MUST follow the `handover-protocol` to sync technical documents in `docs/`.
+---
 
-## DO NOT BLINDLY INFER
-If you are unsure about the architecture, use `view_file` on `docs/ARCHITECTURE.md`. Do not assume.
+## 📂 1. 目錄結構規範 (Directory Structure Guidelines)
+
+本專案採用**「功能模組化 (Feature-Based) 結構」**，禁止將檔案扁平放置於根目錄。所有新舊檔案必須依據其功能歸類：
+
+### 核心基礎 (Core System)
+*   **`res://core/`**: 全域基礎系統。存放遊戲主入口場景、全域設定、存檔管理、全域單例（Singletons/Autoload）。
+    *   *例如*: `Main.tscn`, `Main.gd`, `selected_style.tres`, 全域配置等。
+
+### 核心玩法模組 (Core Gameplay)
+所有與彈珠台玩法、戰鬥、實體、卡牌直接相關的檔案，統一歸類在 **`res://gameplay/`** 底下：
+*   **`res://gameplay/table/`**: 彈珠台本體與其物理組件。
+    *   `components/`: 彈珠台物理零件（彈珠 `Ball`、鋼釘 `Peg`、拉桿 `Plunger`、得分洞 `ScoreZone`、分隔板 `Divider`）。
+    *   `views/`: 彈珠台視覺渲染視角（如 2D Shader 自由透視 `MarbleShaderPerspectiveView` 等）。
+    *   `shaders/`: 彈珠台專用的着色器。
+    *   `deprecated/`: 收納與封存早期開發或廢棄的 3D 原型代碼。
+*   **`res://gameplay/combat/`**: 戰鬥控制邏輯與戰鬥 UI 介面（如 `CombatManager.gd`, `CombatUI.tscn`）。
+*   **`res://gameplay/entities/`**: 戰鬥中的實體（具有血量、能發動攻擊的對象）。
+    *   `hero/`: 主角（老奶奶）。
+    *   `enemy/`: 敵人（小屁孩、地痞、稽查員等，取代舊的 Monster 命名）。
+*   **`res://gameplay/cards/`**: 卡牌與牌組建構系統。
+    *   `food/`: 食物卡牌（我方的防守與技能卡）。
+    *   `item/`: 道具卡牌（敵方的能量與攻擊卡）。
+    *   `components/`: 卡牌通用 UI 組件（如 `CardWidget`）。
+
+### 未來系統擴充 (Future Systems)
+未來新增非玩法核心之獨立大系統時，應在**根目錄**下建立平行資料夾：
+*   **`res://map/`**: 關卡與推圖大地圖系統。
+*   **`res://shop/`**: 商店與金幣交易系統。
+*   **`res://relics/`**: 祖傳祕方（被動遺跡）系統。
+
+### 靜態資源 (Static Assets)
+*   **`res://assets/`**: 存放所有不含邏輯的純美術與聲音資源。
+    *   `textures/`: 美術貼圖與去背 PNG 貼圖。
+    *   `sounds/`: 音效與音樂。
+    *   `fonts/`: 字體。
+
+---
+
+## 🏷️ 2. 命名與語意規範 (Naming & Semantics)
+
+1.  **敵人命名**：本遊戲的世界觀是夜市對抗奧客與稽查員，**禁止使用 Monster（怪物）** 命名。任何敵人相關的類別、變數、場景與檔案，必須統一使用 **`Enemy`**。
+    *   *正確*: `EnemyWidget.tscn`, `EnemyWidget.gd`, `enemy_list`
+    *   *錯誤*: `MonsterWidget.tscn`, `monster_data`
+2.  **檔案命名風格**：
+    *   **場景 (.tscn)、資源 (.tres)、腳本 (.gd)**: 統一使用 **PascalCase**（大駝峰命名法），與類名保持一致。
+        *   *例如*: `MarbleTable.tscn`, `CardResource.gd`
+    *   **小組件或工具類場景**: 亦使用 PascalCase。
+    *   **靜態資源 (美術貼圖、音效等)**: 統一使用 **snake_case**（蛇形命名法）。
+        *   *例如*: `cartoon_marble.png`, `button_click.wav`
+
+---
+
+## 🔧 3. 開發技能 (Developer Skill for AI)
+
+任何 AI 助理在為此專案服務時，在**產生、移動或修改任何檔案前**，必須：
+1.  自動讀取並對齊本規則。
+2.  新建檔案時，自動尋找本規則定義的正確路徑進行建立。
+3.  搬移檔案後，必須主動寫入並執行路徑修復工具，確保所有 `.tscn`、`.tres`、`.gd` 檔案內的引用路徑與類別名稱全部在第一時間更新。

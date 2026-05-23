@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://b8j8j8j8j8j8"]
+
+[ext_resource type="Script" uid="uid://c5trbilwpysm1" path="res://gameplay/table/components/Plunger.gd" id="1_script"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(40, 200)
+
+[node name="Plunger" type="Node2D" unique_id=1170735164]
+script = ExtResource("1_script")
+
+[node name="PlungerHead" type="AnimatableBody2D" parent="." unique_id=192284675]
+metadata/_edit_group_ = true
+
+[node name="ColorRect" type="ColorRect" parent="PlungerHead" unique_id=1835835167]
+offset_left = -20.0
+offset_top = -10.0
+offset_right = 20.0
+offset_bottom = 190.0
+color = Color(0.8, 0.2, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlungerHead" unique_id=2129524507]
+position = Vector2(0, 90)
+shape = SubResource("RectangleShape2D_1")

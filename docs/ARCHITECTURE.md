@@ -2,31 +2,26 @@
 
 本文件描述 Marble Table 的核心設計決策與物件連結方式，供 AI 快速理解「房子是怎麼蓋的」。
 
-## 1. 核心技術棧 (3D 轉型)
-- **渲染模式:** 混合 2D/3D。UI 保持 2D，遊戲桌面採用 **Native 3D**。
-- **物理引擎:** `Godot Physics 3D`。
-- **視覺風格:** 3D Toon Shader (卡通渲染)。使用 `next_pass` 頂點擴張法實作像素邊線。
-- **解析度/比例:** 3D 空間與 2D 座標採 `1:100` 換算 (PIXELS_PER_UNIT = 100)。
+## 1. 核心技術棧 (著色器 2D 形變透視)
+- **渲染模式:** 混合 2D/透視投影。UI 保持純 2D 渲染，遊戲桌面採用 **SubViewport 2D 渲染 + Shader 形變透視**。
+- **物理引擎:** `Godot Box2D 2D 物理`，確保彈珠運動絕對扁平且穩定。
+- **視覺風格:** 透過 `perspective_warp.gdshader` 進行 3D 卡通效果的形變拉伸，讓 2D 平面在 2D TextureRect 上呈現出精美的 3D 透視斜面感。
+- **解析度/比例:** 桌面的解析度被嚴格封裝在 `457 x 854` 像素的 `TableViewport` 中，以保證座標系完全一致。
 
 ## 2. 物件組成 (Composition)
-專案已從純 2D 遷移至「視口嵌入式 3D」架構：
+專案採用「視口著色器變形」與「對稱卡牌」雙重核心架構：
 
-- **`MarblePerspectiveView` (視窗容器):** 使用 `SubViewportContainer` 承載 3D 世界。
-- **`SubViewport`:** 開啟 `physics_object_picking` 以支援滑鼠與 3D 物件互動。
-- **`MarbleTable3D` (3D 實體):** 取代舊版 2D Table。包含實體化的牆壁、釘子、拉桿與得分區。
-- **`CombatManager` (邏輯核心):** 保持不變，接收來自 3D 得分區的 `slot_hit` 信號。
-- **`Plunger3D`:** 3D 物理拉桿，支援滑鼠拖拽與彈性回彈。
-- **`ScoreZone3D`:** 3D 得分區偵測，進入後觸發技能並銷毀彈珠。
+- **`MarbleShaderPerspectiveView` (透視組件):** 
+    - 使用 `SubViewport` 承載與封裝 `MarbleTable`。
+    - 透過底層的 `TableScreen` (TextureRect) 讀取視口貼圖，並加載四角點形變 Shader 將畫面拉伸投影。
+- **`ViewportInputHandler` / `MarbleShaderPerspectiveView.gd` (輸入投影橋接):**
+    - 負責精確逆算滑鼠在形變畫面的 UV，並將其轉回 `0~1` 內部座標，進而精確推算傳遞給 SubViewport 中的彈珠台。
+- **`CombatUI` (左右對稱介面):**
+    - **左側 我方老奶奶 (`PlayerSide`)**：渲染大頭像、總血條與縱向手牌（`CardHand`）。
+    - **右側 奧客敵方 (`EnemySide`)**：幾何鏡像渲染大頭像、總血條與縱向道具卡（`ItemCardContainer`）。
+- **`CombatManager` (邏輯核心):** 管理雙向 HP 狀態與卡牌 CD/凍結。接收來自彈珠台的 `slot_hit` 得分信號，進行即時戰鬥演算。
 
-## 3. 2D/3D 橋接機制 (The Bridge)
-- **輸入橋接:** `ViewportInputHandler.gd` 負責將 2D 螢幕座標透過 Raycast 轉換為 3D 互動，或透過 `physics_object_picking` 直接與 3D 碰撞體互動。
-- **信號橋接:** `Main.gd` 持有 `MarbleTable3D` 的引用，維持舊有的信號連接邏輯（如 `slot_hit`），確保 2D UI 與 3D 物理同步。
+## 3. 2D 物理動態與槽位發光
+- **槽位指示發光**: 在 `ScoreZone.tscn` 槽位底部配置了 `Indicator`，其 Y 座標已從 Y=864 上移至 **Y=834**，以確保不會被 `SubViewport` 高度限制 (854px) 裁切。
+- **燈號顏色更新**: `Main.gd` 接取選牌變更後，會通過 `MarbleTable.update_slot_indicators(card)` 來動態調整這 8 個發光槽的顏色。
 
-## 4. 卡通美學實作 (Toon Aesthetic)
-- **AdvancedToonShader:** 
-    - **Pass 1:** 自定義 `Light` 函數實作階梯光影 (Toon Shading)。
-    - **Pass 2 (Outline):** 使用 `next_pass` 配合 `cull_front` 實作可調寬度的物件邊線。
-
-## 5. 物理動態調整與穩定性
-- **邊界保護:** 設有隱形的「正面玻璃 (Front Glass)」防止彈珠在碰撞中彈出 Z 軸平面。
-- **軸向鎖定:** 彈珠 (`RigidBody3D`) 鎖定 Z 軸線性位移，確保其保持在 XY 平面運動。

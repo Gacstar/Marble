@@ -1,3 +1,6 @@
+---
+tags: [type/handover-notes, module/combat-system, module/card-hand, status/bug-fixed]
+---
 # 📝 奧客戰鬥重構與對稱 UI 實作交接文件
 
 本文件詳細記錄了 2026-05-23 本次對話中完成的**雙向對稱、單一敵人與敵方道具卡系統**的重構細節，便於下一次對話中讓 AI 助手能完美接軌、無縫理解當前的專案架構。

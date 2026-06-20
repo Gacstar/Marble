@@ -1,3 +1,8 @@
+---
+name: onboarding-mastery
+description: 專案導航與新人引導。確保新助手能快速掌握專案全貌並遵循現有規範。當使用者說「剛接手專案」、「讀取導航」、「了解開發規範」時觸發。
+---
+
 # Skill: 專案導航與新人引導 (Onboarding Mastery)
 
 | Metadata | Value |

@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://bmwfdjamotm8w"]
+
+[ext_resource type="Script" uid="uid://dvik1d1txwfam" path="res://gameplay/combat/Projectile.gd" id="1_projectile_script"]
+
+[node name="Projectile" type="TextureRect" unique_id=1956480851]
+offset_right = 48.0
+offset_bottom = 48.0
+expand_mode = 1
+stretch_mode = 5
+script = ExtResource("1_projectile_script")

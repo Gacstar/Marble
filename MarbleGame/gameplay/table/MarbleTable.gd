@@ -48,20 +48,9 @@ func update_slot_indicators(card: CardResource):
 	var slot_map = card.slot_map
 	for i in range(slot_zones.size()):
 		if i < slot_map.size():
-			var type = slot_map[i]
-			var color = Color(0.6, 0.6, 0.6) # Default Gray (Skill A)
-			
-			if type == 1: # Skill B
-				if card.skill_b_is_heal:
-					color = Color(0.2, 0.8, 0.3) # Green
-				elif card.skill_b_is_delay_cd:
-					color = Color(0.4, 0.6, 1.0) # Blue
-				elif card.skill_b_is_damage_buff:
-					color = Color(1.0, 0.3, 1.0) # Purple
-				else:
-					color = Color(1.0, 0.9, 0.2) # Yellow
-			
+			var color = card.skill_a_color if slot_map[i] == 0 else card.skill_b_color
 			slot_zones[i].set_indicator_color(color)
+
 
 func clear_slot_marbles(slot_index: int):
 	if slot_index < 0 or slot_index >= slot_zones.size():

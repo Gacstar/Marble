@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bbo55pst154p5" path="res://gameplay/combat/CombatUI.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://coyvs4qwm6qxc" path="res://assets/textures/cat_player.jpg" id="2_cat"]
+[ext_resource type="Script" path="res://gameplay/combat/SkillDirector.gd" id="3_skill_director"]
 
 [node name="CombatUI" type="CanvasLayer" unique_id=1445871488]
 script = ExtResource("1_script")
@@ -14,7 +15,7 @@ offset_top = 100.0
 offset_right = 430.0
 offset_bottom = 750.0
 
-[node name="CatSprite" type="TextureRect" parent="PlayerSide" unique_id=74768310]
+[node name="GrandmaSprite" type="TextureRect" parent="PlayerSide" unique_id=74768310]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -76,7 +77,7 @@ grow_horizontal = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 24
-text = "Player (Cat)"
+text = "老奶奶"
 horizontal_alignment = 1
 
 [node name="CardHand" type="VBoxContainer" parent="PlayerSide" unique_id=1999927464]
@@ -184,3 +185,6 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 10
 alignment = 1
+
+[node name="SkillDirector" type="Node" parent="."]
+script = ExtResource("3_skill_director")

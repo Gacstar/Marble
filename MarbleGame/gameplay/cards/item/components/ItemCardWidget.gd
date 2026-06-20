@@ -5,6 +5,7 @@ signal item_card_clicked(index)
 @onready var name_label = $Margin/VBox/ItemName
 @onready var icon_rect = $Margin/VBox/Icon
 @onready var cd_label = $Margin/VBox/CDLabel
+@onready var desc_label = $Margin/VBox/DescLabel
 @onready var selection_frame = $SelectionFrame
 @onready var lock_overlay = $LockOverlay
 @onready var lock_label = $Margin/VBox/LockLabel
@@ -18,6 +19,21 @@ func setup(idx: int, resource: ItemCardResource, selected: bool):
 	icon_rect.texture = resource.item_icon
 	
 	cd_label.text = "CD: %d" % resource.cd
+	
+	# 根據 skill_type 顯示功能描述
+	match resource.skill_type:
+		"damage":
+			desc_label.text = "[傷害] -%d" % resource.skill_value
+			desc_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35))
+		"debuff":
+			desc_label.text = "[減速] CD+%d" % resource.skill_value
+			desc_label.add_theme_color_override("font_color", Color(0.4, 0.7, 1.0))
+		"heal":
+			desc_label.text = "[回復] +%d" % resource.skill_value
+			desc_label.add_theme_color_override("font_color", Color(0.3, 0.9, 0.4))
+		_:
+			desc_label.text = "[效果] %d" % resource.skill_value
+			desc_label.remove_theme_color_override("font_color")
 	
 	is_locked = resource.lock_turns > 0
 	if is_locked:

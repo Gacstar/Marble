@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://b5do5nqfbpxqy"
+
+[deps]
+
+files=["res://gameplay/cards/food/cards.name.translation", "res://gameplay/cards/food/cards.skill.translation", "res://gameplay/cards/food/cards.skill.translation", "res://gameplay/cards/food/cards.skill.translation", "res://gameplay/cards/food/cards.skill.translation", "res://gameplay/cards/food/cards.slots.translation", "res://gameplay/cards/food/cards.icon.translation"]
+
+source_file="res://gameplay/cards/food/cards.csv"
+dest_files=["res://gameplay/cards/food/cards.name.translation", "res://gameplay/cards/food/cards.skill.translation", "res://gameplay/cards/food/cards.skill.translation", "res://gameplay/cards/food/cards.skill.translation", "res://gameplay/cards/food/cards.skill.translation", "res://gameplay/cards/food/cards.slots.translation", "res://gameplay/cards/food/cards.icon.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

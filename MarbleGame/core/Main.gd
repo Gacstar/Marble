@@ -29,11 +29,62 @@ func _ready():
 	_on_hand_initialized(combat_manager.hand_cards)
 	_on_card_selection_changed(combat_manager.selected_hand_idx)
 
+var is_playing_animation: bool = false
+
 func _on_slot_hit(slot_idx):
-	combat_manager.trigger_skill_from_slot(slot_idx)
+	if is_playing_animation:
+		return # 防抖防重複進洞同時觸發表演衝突
+		
+	is_playing_animation = true
+	
+	# 1. 在執行邏輯與換牌之前，先播放當前選中卡牌縮放兩下的啟動動畫
+	await combat_ui.skill_director.play_card_zoom_animation(combat_manager.selected_hand_idx)
+	
+	# 2. 執行計算，取得戰鬥收據，並暫時不更新 UI 的 HP 條 (因為 is_playing_animation = true)
+	var receipt = combat_manager.trigger_skill_from_slot(slot_idx)
+	
+	# 2. 播放我方行動表演 (攻擊或治療)
+	if receipt.damage_dealt > 0:
+		await combat_ui.skill_director.play_player_attack(
+			receipt.card, 
+			receipt.damage_dealt, 
+			receipt.old_enemy_hp, 
+			receipt.new_enemy_hp, 
+			combat_manager.active_enemy.max_hp
+		)
+	elif receipt.heal_amount > 0:
+		await combat_ui.skill_director.play_heal_effect(
+			receipt.heal_amount, 
+			receipt.old_player_hp, 
+			receipt.new_player_hp, 
+			combat_manager.player_max_hp
+		)
+		
+	# 3. 播放敵方反擊表演
+	var current_player_hp = receipt.old_player_hp
+	if receipt.heal_amount > 0:
+		current_player_hp = receipt.new_player_hp
+		
+	for attack in receipt.enemy_attacks:
+		var next_player_hp = current_player_hp - attack.damage
+		if next_player_hp < 0:
+			next_player_hp = 0
+			
+		await combat_ui.skill_director.play_enemy_attack(
+			attack.item_name,
+			attack.damage,
+			current_player_hp,
+			next_player_hp,
+			combat_manager.player_max_hp
+		)
+		current_player_hp = next_player_hp
+		
+	# 4. 表演完畢，將 is_playing_animation 設為 false，並呼叫一次 emit_combat_signal 做最終的 HP 血條完全對齊
+	is_playing_animation = false
+	combat_manager.emit_combat_signal()
 
 func _on_combat_updated(p_hp, p_max, active_enemy, item_cards, t_idx, mult):
-	combat_ui.update_ui(p_hp, p_max, active_enemy, item_cards, t_idx, mult)
+	combat_ui.update_ui(p_hp, p_max, active_enemy, item_cards, t_idx, mult, is_playing_animation)
 
 func _on_enemy_attacked(m_name, dmg):
 	combat_ui.show_damage_effect(m_name, dmg)

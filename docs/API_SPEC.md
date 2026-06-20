@@ -1,3 +1,6 @@
+---
+tags: [type/api-spec, module/combat-system, module/card-hand, module/physics-box2d, module/viewport-input]
+---
 # 技術參考手冊 (API_SPEC.md)
 
 ## CombatManager.gd (核心戰鬥與卡牌管理)
@@ -16,7 +19,19 @@
 
 ### 函式 (Methods)
 - `select_enemy(idx: int)`: 手動選中目標道具卡，作為封鎖/冰凍技能的目標。
-- `trigger_skill_from_slot(slot_index: int)`: 觸發食物卡技能，計算傷害(含倍率/道具卡CD封鎖/補血)並洗牌。
+- `trigger_skill_from_slot(slot_index: int) -> Dictionary`: 觸發食物卡技能，計算傷害並更新狀態，返回內含我方行動、敵方反擊、新舊生命狀態轉變之「戰鬥收據（Receipt）」。
+
+## SkillDirector.gd (技能演出與時序管理器)
+### 屬性 (Properties)
+- `projectile_scene`: PackedScene，投擲物預製場景。
+- `damage_popup_scene`: PackedScene，飄字預製場景。
+
+### 函式 (Methods)
+- `play_card_zoom_animation(card_idx: int) -> void`: 播放指定索引之手牌卡片縮放兩下（放大至 1.22 倍後縮回）的發動動畫。
+- `play_player_attack(card: CardResource, damage: int, from_enemy_hp: int, to_enemy_hp: int, max_enemy_hp: int) -> void`: 播放老奶奶向敵人投擲食物球、敵人抖動閃紅、受擊飄字與血條平滑扣減之非同步動畫。
+- `play_enemy_attack(item_name: String, damage: int, from_player_hp: int, to_player_hp: int, max_player_hp: int) -> void`: 播放敵人朝老奶奶發射球體、老奶奶抖動閃紅、扣血飄字與血條平滑扣減之非同步動畫。
+- `play_heal_effect(amount: int, from_player_hp: int, to_player_hp: int, max_player_hp: int) -> void`: 播放老奶奶治癒綠光、綠色補血飄字與血條平滑回彈之非同步動畫。
+
 
 ## CardResource.gd (卡牌資料資源)
 ### 屬性 (Properties)

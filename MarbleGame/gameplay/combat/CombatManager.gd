@@ -29,37 +29,13 @@ func _ready():
 	reset_combat()
 
 func _initialize_all_cards():
-	var all_pool: Array[CardResource] = []
-	
-	var lion = _create_card("Lion", "lion_icon.jpg", 6, 12, [0, 0, 0, 1, 1, 0, 0, 0])
-	var eagle = _create_card("Eagle", "eagle_icon.jpg", 5, 15, [1, 0, 1, 0, 1, 0, 1, 0])
-	var wolf = _create_card("Wolf", "wolf_icon.jpg", 8, 30, [0, 1, 1, 1, 1, 1, 1, 0])
-	var owl = _create_card("Owl", "owl_icon.jpg", 4, 3, [0, 0, 0, 0, 0, 0, 0, 1])
-	var bear = _create_card("Bear", "bear_icon.jpg", 10, 11, [1, 1, 1, 1, 0, 0, 0, 0])
-	var tiger = _create_card("Tiger", "tiger_icon.jpg", 7, 14, [0, 1, 0, 1, 0, 1, 0, 1])
-	var dragon = _create_card("Dragon", "dragon_icon.jpg", 1, 0, [0, 0, 0, 0, 1, 0, 0, 0])
-	var phoenix = _create_card("Phoenix", "dragon_icon.jpg", 5, 25, [1, 1, 0, 0, 0, 0, 1, 1])
-	
-	wolf.skill_b_is_heal = true
-	owl.skill_b_is_delay_cd = true # 代表延緩/封鎖
-	dragon.skill_b_is_damage_buff = true
-	
-	all_pool = [lion, eagle, wolf, owl, bear, tiger, dragon, phoenix]
+	var all_pool: Array[CardResource] = CardDataLoader.load_all()
 	all_pool.shuffle()
 	
 	hand_cards = all_pool.slice(0, hand_size)
 	deck_cards = all_pool.slice(hand_size)
 	
 	hand_initialized.emit(hand_cards)
-
-func _create_card(n, icon_name, a, b, slots) -> CardResource:
-	var c = CardResource.new()
-	c.animal_name = n
-	c.animal_icon = load("res://assets/textures/" + icon_name)
-	c.skill_a_value = a
-	c.skill_b_value = b
-	c.slot_map.assign(slots as Array[int])
-	return c
 
 func reset_combat():
 	player_hp = player_max_hp
@@ -116,13 +92,25 @@ func select_enemy(idx: int):
 		enemy_selection_changed.emit(idx)
 		emit_combat_signal()
 
-func trigger_skill_from_slot(slot_index: int):
+func trigger_skill_from_slot(slot_index: int) -> Dictionary:
 	var card = hand_cards[selected_hand_idx]
+	
+	var receipt = {
+		"card": card,
+		"old_player_hp": player_hp,
+		"old_enemy_hp": active_enemy.hp,
+		"damage_dealt": 0,
+		"heal_amount": 0,
+		"enemy_attacks": [],
+		"new_player_hp": player_hp,
+		"new_enemy_hp": active_enemy.hp
+	}
+	
 	var value = card.get_skill_value(slot_index)
 	var is_skill_b = (card.get_skill_type(slot_index) == 1)
 	
 	slot_counts[slot_index] += 1
-	var is_ultimate = (slot_counts[slot_index] == 5)
+	var is_ultimate = (slot_counts[slot_index] == 3)
 	
 	if is_ultimate:
 		value *= 2
@@ -132,6 +120,7 @@ func trigger_skill_from_slot(slot_index: int):
 	if is_skill_b and card.skill_b_is_heal:
 		player_hp += value
 		if player_hp > player_max_hp: player_hp = player_max_hp
+		receipt.heal_amount = value
 		player_healed.emit(value)
 	elif is_skill_b and card.skill_b_is_delay_cd:
 		if target_item_idx >= 0 and target_item_idx < item_cards.size():
@@ -149,12 +138,21 @@ func trigger_skill_from_slot(slot_index: int):
 			active_enemy.hp = 0
 			enemy_defeated.emit(active_enemy.name)
 		
+		receipt.damage_dealt = damage
 		# 傷害觸發後重置倍率
 		next_damage_multiplier = 1
 	
+	receipt.new_enemy_hp = active_enemy.hp
+	
 	_swap_active_card()
-	enemy_turn_tick()
+	
+	# 跑敵人回合 Tick，並收集反擊資訊
+	var attacks = enemy_turn_tick()
+	receipt.enemy_attacks = attacks
+	receipt.new_player_hp = player_hp
+	
 	emit_combat_signal()
+	return receipt
 
 func _swap_active_card():
 	var used_card = hand_cards[selected_hand_idx]
@@ -163,9 +161,10 @@ func _swap_active_card():
 	hand_cards[selected_hand_idx] = new_card
 	card_swapped.emit(selected_hand_idx, new_card)
 
-func enemy_turn_tick():
+func enemy_turn_tick() -> Array:
+	var attacks = []
 	if active_enemy.hp <= 0:
-		return
+		return attacks
 		
 	for card in item_cards:
 		if card.lock_turns > 0:
@@ -180,6 +179,11 @@ func enemy_turn_tick():
 			if player_hp < 0: player_hp = 0
 			card.cd = card.cd_default
 			enemy_attacked.emit(card.item_name, damage)
+			attacks.append({
+				"item_name": card.item_name,
+				"damage": damage
+			})
+	return attacks
 
 func emit_combat_signal():
 	combat_updated.emit(player_hp, player_max_hp, active_enemy, item_cards, target_item_idx, next_damage_multiplier)

@@ -3,6 +3,7 @@ extends CanvasLayer
 @onready var player_hp_bar = $PlayerSide/ProgressBar
 @onready var player_hp_label = $PlayerSide/HPLabel
 @onready var card_container = $PlayerSide/CardHand
+@onready var skill_director = $SkillDirector
 
 @onready var enemy_sprite = $EnemySide/EnemySprite
 @onready var enemy_hp_bar = $EnemySide/ProgressBar
@@ -46,12 +47,13 @@ func update_selection(selected_idx: int):
 		if i < current_hand.size():
 			food_card_widgets[i].setup(i, current_hand[i], i == current_selected_card_idx, current_multiplier)
 
-func update_ui(player_hp: int, p_max: int, enemy_data: Dictionary, item_cards_data: Array, target_item_idx: int, multiplier: int):
+func update_ui(player_hp: int, p_max: int, enemy_data: Dictionary, item_cards_data: Array, target_item_idx: int, multiplier: int, skip_hp: bool = false):
 	current_multiplier = multiplier
 	# 更新玩家 (老奶奶) HP UI
-	player_hp_bar.max_value = p_max
-	player_hp_bar.value = player_hp
-	player_hp_label.text = "HP: %d / %d" % [player_hp, p_max]
+	if not skip_hp:
+		player_hp_bar.max_value = p_max
+		player_hp_bar.value = player_hp
+		player_hp_label.text = "HP: %d / %d" % [player_hp, p_max]
 	
 	# 更新手牌顯示
 	for i in range(food_card_widgets.size()):
@@ -59,9 +61,10 @@ func update_ui(player_hp: int, p_max: int, enemy_data: Dictionary, item_cards_da
 			food_card_widgets[i].setup(i, current_hand[i], i == current_selected_card_idx, multiplier)
 	
 	# 更新敵方 (奧客) HP UI 及大頭像
-	enemy_hp_bar.max_value = enemy_data.max_hp
-	enemy_hp_bar.value = enemy_data.hp
-	enemy_hp_label.text = "HP: %d / %d" % [enemy_data.hp, enemy_data.max_hp]
+	if not skip_hp:
+		enemy_hp_bar.max_value = enemy_data.max_hp
+		enemy_hp_bar.value = enemy_data.hp
+		enemy_hp_label.text = "HP: %d / %d" % [enemy_data.hp, enemy_data.max_hp]
 	enemy_name_label.text = enemy_data.name
 	enemy_sprite.texture = enemy_data.icon
 	

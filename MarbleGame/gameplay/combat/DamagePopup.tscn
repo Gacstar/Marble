@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://cxypopup12345"]
+
+[ext_resource type="Script" path="res://gameplay/combat/DamagePopup.gd" id="1_popup_script"]
+
+[node name="DamagePopup" type="Label"]
+offset_right = 100.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 36
+text = "-15"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("1_popup_script")

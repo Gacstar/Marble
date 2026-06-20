@@ -1,3 +1,9 @@
+---
+name: marble-project-rules
+description: Marble 彈珠台遊戲專案的工作區規則。規定 AI 每次會話開始時必須讀取的文件與遵循的開發規範。
+trigger: always
+---
+
 # Antigravity Workspace Rules (Marble Project)
 
 ## CORE PROTOCOL

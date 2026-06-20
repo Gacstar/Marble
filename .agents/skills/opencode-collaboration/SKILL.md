@@ -1,3 +1,8 @@
+---
+name: opencode-collaboration
+description: OpenCode 協同作業與本地模型自動化。指導 AI 代理如何穩定地呼叫本地端的 OpenCode 進行多代理人協作開發。當使用者說「外包給 OpenCode」、「使用本地模型修改檔案」時觸發。
+---
+
 # Skill: OpenCode 協同作業與本地模型自動化 (OpenCode Collaboration & Automation)
 
 | Metadata | Value |

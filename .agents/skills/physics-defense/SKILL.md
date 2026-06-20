@@ -1,3 +1,8 @@
+---
+name: physics-defense
+description: 物理避坑與穩健性規範。確保彈珠台物理計算的絕對穩定性，避免閃退與穿牆。當使用者說「修改碰撞體」、「調整 MarbleTable」、「處理物理材質」時觸發。
+---
+
 # Skill: 物理避坑與穩健性規範 (Physics Defense)
 
 | Metadata | Value |

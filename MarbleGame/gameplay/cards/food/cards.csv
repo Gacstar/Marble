@@ -1,0 +1,11 @@
+card_id,name,skill_a_id,skill_a_value,skill_b_id,skill_b_value,slots,icon
+1,Lion,1,6,2,12,00011000,lion_icon.jpg
+2,Eagle,1,5,2,15,10101010,eagle_icon.jpg
+3,Wolf,1,8,3,30,01111110,wolf_icon.jpg
+4,Owl,1,4,4,3,00001111,owl_icon.jpg
+5,Bear,1,10,2,11,11110000,bear_icon.jpg
+6,Tiger,1,7,2,14,01010101,tiger_icon.jpg
+7,Dragon,1,5,5,0,00011000,dragon_icon.jpg
+8,Phoenix,1,5,2,25,11000011,dragon_icon.jpg
+9,Wolf_9,2,15,3,30,00001111,wolf_icon.jpg
+10,Wolf_10,3,15,3,30,11110000,wolf_icon.jpg

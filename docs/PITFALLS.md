@@ -1,3 +1,6 @@
+---
+tags: [type/architecture, module/physics-box2d, module/combat-system, status/bug-fixed]
+---
 # Marble 專案踩雷手札 (Technical Pitfalls & Gotchas)
 
 本文件記錄了開發過程中發現的所有技術陷阱，旨在防止後續開發者（不論人或 AI）重複掉入相同的坑洞。
@@ -25,6 +28,10 @@
     - **現象**: 在 Inspector 中設定了屬性但運行時數值錯誤。
     - **原因**: 直接對 `Array[int]` 使用 `=` 賦值有時會失效。
     - **對策**: 使用 `assign()` 函式或確保型別嚴格對齊。
+- **[陷阱] 補間動畫型別提示錯誤 (Tween Type Hint)**:
+    - **現象**: 編輯器報錯 `Could not find type "PropertyTween" in the current scope`。
+    - **原因**: 在 GDScript 2.0 (Godot 4) 中，`create_tween()` 產生的物件型別是 `Tween`。若誤將函式回傳宣告為 `PropertyTween`，會觸發編譯錯誤。
+    - **對策**: 統一使用 `Tween` 作為型別宣告。例如：`func setup(...) -> Tween:`。
 
 ## 4. Godot 4 資源與快取管理 (Resource & Cache Management)
 - **[陷阱] 外部改名/移動檔案導致 UID 快取不同步 (Godot 4 UID Desync)**:

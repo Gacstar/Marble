@@ -29,30 +29,26 @@ func background_logic(resource, selected, multiplier):
 		modulate = Color(1, 1, 1)
 		self.set("theme_override_styles/panel", null)
 	
-	# 技能 A 呈現 (通常是攻擊)
+	# 技能 A 呈現
 	var val_a = resource.skill_a_value * multiplier
-	skill_a_label.text = "[攻擊] A: %d" % val_a
+	skill_a_label.text = "[%s] %d" % [resource.skill_a_display, val_a]
 	if multiplier > 1:
-		skill_a_label.add_theme_color_override("font_color", Color(1, 0.4, 0.4)) # 紅色加強
+		skill_a_label.add_theme_color_override("font_color", Color(1, 0.4, 0.4))
 	else:
 		skill_a_label.remove_theme_color_override("font_color")
-	light_a.color = Color(0.6, 0.6, 0.6)
+	light_a.color = resource.skill_a_color
 	
-	# 技能 B 呈現 (多種效果)
-	light_b.color = Color(1, 1, 1) # 預設
+	# 技能 B 呈現
+	light_b.color = resource.skill_b_color
 	if resource.skill_b_is_heal:
-		light_b.color = Color(0.2, 0.8, 0.3)
-		skill_b_label.text = "[回復] HP+%d" % resource.skill_b_value
+		skill_b_label.text = "[%s] HP+%d" % [resource.skill_b_display, resource.skill_b_value]
 	elif resource.skill_b_is_delay_cd:
-		light_b.color = Color(0.4, 0.6, 1.0) # 藍色代表遲緩
-		skill_b_label.text = "[延緩] CD+%d" % resource.skill_b_value
+		skill_b_label.text = "[%s] CD+%d" % [resource.skill_b_display, resource.skill_b_value]
 	elif resource.skill_b_is_damage_buff:
-		light_b.color = Color(1.0, 0.3, 1.0) # 紫色代表強化
-		skill_b_label.text = "[蓄力] 下次 x2"
+		skill_b_label.text = "[%s] 下次 x2" % resource.skill_b_display
 	else:
 		var val_b = resource.skill_b_value * multiplier
-		light_b.color = Color(1.0, 0.9, 0.2)
-		skill_b_label.text = "[強力] B: %d" % val_b
+		skill_b_label.text = "[%s] %d" % [resource.skill_b_display, val_b]
 		if multiplier > 1:
 			skill_b_label.add_theme_color_override("font_color", Color(1, 0.4, 0.4))
 		else:
@@ -67,14 +63,9 @@ func _update_colormap(resource: CardResource):
 	for type in resource.slot_map:
 		var rect = ColorRect.new()
 		rect.custom_minimum_size = Vector2(8, 8)
-		if type == 0:
-			rect.color = Color(0.6, 0.6, 0.6)
-		else:
-			if resource.skill_b_is_heal: rect.color = Color(0.2, 0.8, 0.3)
-			elif resource.skill_b_is_delay_cd: rect.color = Color(0.4, 0.6, 1.0)
-			elif resource.skill_b_is_damage_buff: rect.color = Color(1.0, 0.3, 1.0)
-			else: rect.color = Color(1.0, 0.9, 0.2)
+		rect.color = resource.skill_a_color if type == 0 else resource.skill_b_color
 		colormap_container.add_child(rect)
+
 
 func _on_gui_input(event):
 	if event is InputEventMouseButton and event.pressed:

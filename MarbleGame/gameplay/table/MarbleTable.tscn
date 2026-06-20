@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://cuegkp7kb7m1s"]
 
-[ext_resource type="Script" path="res://gameplay/table/MarbleTable.gd" id="1_script"]
-[ext_resource type="PackedScene" path="res://gameplay/table/components/Plunger.tscn" id="2_plunger"]
-[ext_resource type="PackedScene" path="res://gameplay/table/components/Peg.tscn" id="3_peg"]
-[ext_resource type="PackedScene" path="res://gameplay/table/components/Divider.tscn" id="4_divider"]
+[ext_resource type="Script" uid="uid://b7ygb0ifnf763" path="res://gameplay/table/MarbleTable.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://b8j8j8j8j8j8" path="res://gameplay/table/components/Plunger.tscn" id="2_plunger"]
+[ext_resource type="PackedScene" uid="uid://bl31rgm0q0c8h" path="res://gameplay/table/components/Peg.tscn" id="3_peg"]
+[ext_resource type="PackedScene" uid="uid://sh8eex8s8elh" path="res://gameplay/table/components/Divider.tscn" id="4_divider"]
 [ext_resource type="PackedScene" path="res://gameplay/table/components/ScoreZone.tscn" id="5_scorezone"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_o1atj"]
@@ -16,7 +16,7 @@ script = ExtResource("1_script")
 offset_right = 457.0
 offset_bottom = 854.0
 mouse_filter = 2
-color = Color(0.95, 0.95, 0.9, 1)
+color = Color(0.9000825, 0.8241421, 0.7075932, 1)
 
 [node name="Walls" type="StaticBody2D" parent="." unique_id=778280357]
 position = Vector2(0, 40)

@@ -48,7 +48,7 @@ func update_slot_indicators(card: CardResource):
 	var slot_map = card.slot_map
 	for i in range(slot_zones.size()):
 		if i < slot_map.size():
-			var color = card.skill_a_color if slot_map[i] == 0 else card.skill_b_color
+			var color = card.get_skill_color(i)
 			slot_zones[i].set_indicator_color(color)
 
 

@@ -1,6 +1,5 @@
-skill_id,skill_type,display_text,color
-1,damage,攻擊,999999
-2,critical,爆擊,EEEE00
-3,heal,回復,33CC66
-4,delay_cd,延緩,6699FF
-5,damage_buff,蓄力,CC33CC
+skill_id,skill_type,display_text,color_a,color_b
+1,damage,攻擊,e0d088,f0cd29
+2,heal,回復,8ec08b,35bf2e
+3,delay_cd,延緩,8ba9d2,5a90d9
+4,damage_buff,蓄力,9674b5,824bb5

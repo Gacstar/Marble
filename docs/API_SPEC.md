@@ -35,9 +35,18 @@ tags: [type/api-spec, module/combat-system, module/card-hand, module/physics-box
 
 ## CardResource.gd (卡牌資料資源)
 ### 屬性 (Properties)
-- `skill_b_is_heal`: 是否為生命恢復技能。
-- `skill_b_is_delay_cd`: 是否為延緩/封鎖敵方道具卡 CD 技能 (Owl)。
-- `skill_b_is_damage_buff`: 是否為下回合雙倍傷害技能 (Dragon)。
+- `skill_a_effect / skill_b_effect`: BaseSkillEffect，技能 A 與 B 的自訂技能資源實體。
+- `skill_a_color_a / skill_a_color_b`: Color，技能 A 在 A 插槽與 B 插槽時的對應渲染顏色。
+- `skill_b_color_a / skill_b_color_b`: Color，技能 B 在 A 插槽與 B 插槽時的對應渲染顏色。
+
+### 函式 (Methods)
+- `get_skill_color(slot_idx: int) -> Color`: 根據插槽索引（0-7）查出該位置應顯示的對應技能 A/B 的色碼。
+- `get_skill_effect(slot_idx: int) -> BaseSkillEffect`: 根據插槽索引（0-7）查出該位置應執行的對應技能 Resource 實體。
+
+## BaseSkillEffect.gd (自訂技能資源基底)
+### 函式 (Methods)
+- `apply_effect(combat_manager: Node, value: int) -> void`: 虛擬函式，衍生技能在此實作具體戰鬥效果邏輯。
+
 
 ## MarbleTable.gd (2D 彈珠台管理器)
 ### 信號 (Signals)

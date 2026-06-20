@@ -36,15 +36,15 @@ func background_logic(resource, selected, multiplier):
 		skill_a_label.add_theme_color_override("font_color", Color(1, 0.4, 0.4))
 	else:
 		skill_a_label.remove_theme_color_override("font_color")
-	light_a.color = resource.skill_a_color
+	light_a.color = resource.skill_a_color_a
 	
 	# 技能 B 呈現
-	light_b.color = resource.skill_b_color
-	if resource.skill_b_is_heal:
+	light_b.color = resource.skill_b_color_b
+	if resource.skill_b_effect is SkillHeal:
 		skill_b_label.text = "[%s] HP+%d" % [resource.skill_b_display, resource.skill_b_value]
-	elif resource.skill_b_is_delay_cd:
+	elif resource.skill_b_effect is SkillDelayCD:
 		skill_b_label.text = "[%s] CD+%d" % [resource.skill_b_display, resource.skill_b_value]
-	elif resource.skill_b_is_damage_buff:
+	elif resource.skill_b_effect is SkillDamageBuff:
 		skill_b_label.text = "[%s] 下次 x2" % resource.skill_b_display
 	else:
 		var val_b = resource.skill_b_value * multiplier
@@ -60,10 +60,10 @@ func background_logic(resource, selected, multiplier):
 func _update_colormap(resource: CardResource):
 	for child in colormap_container.get_children():
 		child.queue_free()
-	for type in resource.slot_map:
+	for idx in range(resource.slot_map.size()):
 		var rect = ColorRect.new()
 		rect.custom_minimum_size = Vector2(8, 8)
-		rect.color = resource.skill_a_color if type == 0 else resource.skill_b_color
+		rect.color = resource.get_skill_color(idx)
 		colormap_container.add_child(rect)
 
 

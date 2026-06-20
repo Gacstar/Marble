@@ -107,7 +107,6 @@ func trigger_skill_from_slot(slot_index: int) -> Dictionary:
 	}
 	
 	var value = card.get_skill_value(slot_index)
-	var is_skill_b = (card.get_skill_type(slot_index) == 1)
 	
 	slot_counts[slot_index] += 1
 	var is_ultimate = (slot_counts[slot_index] == 3)
@@ -117,32 +116,18 @@ func trigger_skill_from_slot(slot_index: int) -> Dictionary:
 		clear_slot_requested.emit(slot_index)
 		slot_counts[slot_index] = 0
 	
-	if is_skill_b and card.skill_b_is_heal:
-		player_hp += value
-		if player_hp > player_max_hp: player_hp = player_max_hp
-		receipt.heal_amount = value
-		player_healed.emit(value)
-	elif is_skill_b and card.skill_b_is_delay_cd:
-		if target_item_idx >= 0 and target_item_idx < item_cards.size():
-			var target_item = item_cards[target_item_idx]
-			target_item.lock_turns += value
-			print("LOG: [LOCK] ", target_item.item_name, " is frozen for ", value, " turns.")
-	elif is_skill_b and card.skill_b_is_damage_buff:
-		next_damage_multiplier = 2
-		print("LOG: NEXT DAMAGE DOUBLED!")
+	# 動態執行技能效果
+	var effect := card.get_skill_effect(slot_index)
+	if effect != null:
+		effect.apply_effect(self, value)
 	else:
-		# 執行傷害
-		var damage = value * next_damage_multiplier
-		active_enemy.hp -= damage
-		if active_enemy.hp <= 0:
-			active_enemy.hp = 0
-			enemy_defeated.emit(active_enemy.name)
-		
-		receipt.damage_dealt = damage
-		# 傷害觸發後重置倍率
-		next_damage_multiplier = 1
+		push_error("CombatManager: Card [%s] slot %d has no skill effect" % [card.animal_name, slot_index])
 	
+	# 根據狀態變化自動填寫收據
+	receipt.damage_dealt = receipt.old_enemy_hp - active_enemy.hp
+	receipt.heal_amount = player_hp - receipt.old_player_hp
 	receipt.new_enemy_hp = active_enemy.hp
+
 	
 	_swap_active_card()
 	

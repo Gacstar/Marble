@@ -18,6 +18,8 @@
 - `module/combat-system`：雙向 HP 管理、戰鬥邏輯、CombatManager 與計分槽得分判定
 - `module/card-hand`：手牌/道具卡 CD 計算、滑動凍結與卡牌行為機制
 - `module/viewport-input`：形變畫面的滑鼠點擊 UV 投影逆算處理 (ViewportInputHandler)
+- `module/tools`：開發輔助工具、本地 CSV 編輯器與背景自銷毀啟動腳本
+
 
 ## 3. 狀態與輔助標籤 (Status Tags)
 標示檔案記錄的特別工程狀態：

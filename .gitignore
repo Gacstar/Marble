@@ -16,3 +16,7 @@ MarbleGame/build/
 
 # Exclude heavy artwork files and reference media
 ArtWork/
+
+# Backups and temporary build files
+*.csv.bak
+**/~*.dll

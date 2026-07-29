@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marble 卡牌與技能編輯器</title>
+    <!-- 載入 Outfit 字型 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --panel-bg: rgba(20, 28, 47, 0.6);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --sidebar-bg: #111827;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            
+            --accent-primary: #6366f1; /* Indigo */
+            --accent-primary-hover: #4f46e5;
+            --accent-success: #10b981; /* Emerald */
+            --accent-warning: #f59e0b; /* Amber */
+            --accent-danger: #ef4444; /* Rose */
+            
+            --transition-speed: 0.2s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
+        }
+
+        /* Header 樣式 */
+        header {
+            height: 70px;
+            background-color: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--panel-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            z-index: 10;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-primary), #a855f7);
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .header-title h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(to right, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* 儲存按鈕動態呼吸效果 */
+        .btn-save {
+            background-color: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-save:hover {
+            background-color: var(--accent-primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-save.dirty {
+            background-color: var(--accent-warning);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+            animation: pulse-amber 2s infinite;
+        }
+
+        @keyframes pulse-amber {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        /* 主容器佈局 */
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* 左側導覽列 (分頁與列表) */
+        .sidebar {
+            width: 320px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 頁籤切換 */
+        .tab-buttons {
+            display: flex;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 6px;
+            margin: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--panel-border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background-color: var(--panel-bg);
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 搜尋與新增控制區 */
+        .list-controls {
+            padding: 0 15px 15px 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--panel-border);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color var(--transition-speed);
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-primary);
+        }
+
+        .btn-add {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid var(--panel-border);
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .btn-add:hover {
+            background-color: var(--accent-success);
+            border-color: var(--accent-success);
+        }
+
+        /* 列表區 */
+        .list-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 15px 15px 15px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+
+        .list-item:hover {
+            background-color: rgba(255, 255, 255, 0.06);
+            transform: translateX(2px);
+        }
+
+        .list-item.selected {
+            background-color: rgba(99, 102, 241, 0.15);
+            border-color: var(--accent-primary);
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .item-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .item-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-avatar-fallback {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .item-text {
+            min-width: 0;
+        }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all var(--transition-speed);
+            opacity: 0;
+        }
+
+        .list-item:hover .btn-delete {
+            opacity: 1;
+        }
+
+        .btn-delete:hover {
+            color: var(--accent-danger);
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        /* 中間編輯區 */
+        .editor-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            border-right: 1px solid var(--panel-border);
+            background-color: rgba(15, 23, 42, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .editor-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--panel-border);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .input-control {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--panel-border);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all var(--transition-speed);
+            width: 100%;
+        }
+
+        .input-control:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .input-control:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        select.input-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3%3Cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3C/svg%3E");
+            background-position: right 10px center;
+            background-repeat: no-repeat;
+            background-size: 20px;
+            padding-right: 35px;
+        }
+
+        /* 雙向色彩控制組 */
+        .color-inputs-pair {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .color-picker-wrapper {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--panel-border);
+            cursor: pointer;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .color-picker-input {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+            background: none;
+        }
+
+        .hex-input-prefix {
+            position: relative;
+            flex: 1;
+        }
+
+        .hex-input-prefix::before {
+            content: '#';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .hex-input-prefix .input-control {
+            padding-left: 28px;
+        }
+
+        /* Slots 點選面板 */
+        .slots-selector-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--panel-border);
+        }
+
+        .slot-dot-btn {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            background-color: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .slot-dot-btn:hover {
+            border-color: var(--accent-primary);
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+
+        .slot-dot-btn.active {
+            background: radial-gradient(circle, var(--accent-success) 0%, #065f46 100%);
+            border-color: #34d399;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+        }
+
+        /* 右側即時預覽區 */
+        .preview-area {
+            width: 360px;
+            background-color: rgba(11, 15, 25, 0.9);
+            border-left: 1px solid var(--panel-border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            position: relative;
+        }
+
+        .preview-header {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .preview-header::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-success);
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* 卡牌實體渲染 */
+        .game-card-wrapper {
+            perspective: 800px;
+        }
+
+        .game-card {
+            width: 280px;
+            height: 420px;
+            background-color: #151b2e;
+            border-radius: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            transition: transform 0.5s;
+        }
+
+        .game-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .card-preview-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-preview-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-preview-id {
+            font-size: 11px;
+            font-weight: 700;
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: #d1d5db;
+        }
+
+        .card-preview-image-box {
+            flex: 1;
+            background-color: #0b0f19;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 14px;
+        }
+
+        .card-preview-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-preview-image-fallback {
+            font-size: 32px;
+            color: rgba(255, 255, 255, 0.1);
+        }
+
+        .card-preview-skills {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .skill-badge {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .skill-badge-value {
+            font-size: 12px;
+            background-color: rgba(0, 0, 0, 0.25);
+            padding: 1px 7px;
+            border-radius: 20px;
+            font-family: monospace;
+        }
+
+        .card-preview-slots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 0 4px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .preview-slot-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.15);
+            transition: all var(--transition-speed);
+        }
+
+        .preview-slot-dot.active {
+            background-color: #34d399;
+            box-shadow: 0 0 8px #34d399, 0 0 3px #10b981;
+        }
+
+        /* 技能預覽 */
+        .skill-preview-card {
+            width: 260px;
+            background-color: #151b2e;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .skill-tag-preview {
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .skill-preview-info {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: left;
+            background-color: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--panel-border);
+        }
+
+        .empty-state {
+            color: var(--text-muted);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* 提示框 (Toast) */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: rgba(16, 185, 129, 0.95);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 999;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 頂部 Header -->
+    <header>
+        <div class="header-logo">
+            <div class="logo-icon">M</div>
+            <div class="header-title">
+                <h1>Marble 卡牌與技能編輯器</h1>
+            </div>
+        </div>
+        <div class="header-actions">
+            <span id="save-status" style="font-size: 13px; color: var(--text-muted);">載入中...</span>
+            <button id="btn-save-all" class="btn-save">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11 2H9v3h2V2Z"/>
+                    <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5V2.914a1.5 1.5 0 0 0-.44-1.06L14.146.439A1.5 1.5 0 0 0 13.086 0H1.5ZM4 6a1 1 0 0 1-1-1V1h10v4a1 1 0 0 1-1 1H4ZM3 9h10a1 1 0 0 1 1 1v5H2v-5a1 1 0 0 1 1-1Z"/>
+                </svg>
+                儲存所有變更
+            </button>
+        </div>
+    </header>
+
+    <!-- 主要操作區 -->
+    <div class="main-container">
+        
+        <!-- 左側導覽 sidebar -->
+        <div class="sidebar">
+            <!-- 頁籤切換按鈕 -->
+            <div class="tab-buttons">
+                <button class="tab-btn active" id="tab-cards-btn" onclick="switchTab('cards')">🎴 卡牌管理</button>
+                <button class="tab-btn" id="tab-skills-btn" onclick="switchTab('skills')">⚡ 技能管理</button>
+            </div>
+            
+            <!-- 搜尋與新增 -->
+            <div class="list-controls">
+                <div class="search-box">
+                    <input type="text" id="search-input" class="search-input" placeholder="搜尋..." oninput="filterList()">
+                </div>
+                <button class="btn-add" id="btn-add-item" onclick="addNewItem()" title="新增項目">+</button>
+            </div>
+            
+            <!-- 列表清單 -->
+            <div class="list-wrapper" id="list-container">
+                <!-- JavaScript 動態填入 -->
+            </div>
+        </div>
+
+        <!-- 中間編輯區 -->
+        <div class="editor-area" id="editor-area">
+            <!-- 卡牌編輯區 -->
+            <div id="cards-editor-panel" class="editor-card">
+                <div class="panel-title">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                    </svg>
+                    卡牌屬性編輯
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="card-id-input">卡牌 ID</label>
+                        <input type="text" id="card-id-input" class="input-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="card-name-input">動物名稱 (英文)</label>
+                        <input type="text" id="card-name-input" class="input-control" placeholder="例如 Lion" oninput="updateCurrentCardData()">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="card-skill-a-select">技能 A (中文類型)</label>
+                        <select id="card-skill-a-select" class="input-control" onchange="updateCurrentCardData()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="card-skill-a-val">技能 A 數值</label>
+                        <input type="number" id="card-skill-a-val" class="input-control" min="0" oninput="updateCurrentCardData()">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="card-skill-b-select">技能 B (中文類型)</label>
+                        <select id="card-skill-b-select" class="input-control" onchange="updateCurrentCardData()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="card-skill-b-val">技能 B 數值</label>
+                        <input type="number" id="card-skill-b-val" class="input-control" min="0" oninput="updateCurrentCardData()">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="card-icon-select">卡牌貼圖圖示 (textures 目錄)</label>
+                        <select id="card-icon-select" class="input-control" onchange="updateCurrentCardData()"></select>
+                    </div>
+
+                    <div class="form-group full-width slots-selector-container">
+                        <label>彈珠插槽配置 (Slots - 8 位元點點配置)</label>
+                        <div class="slots-grid" id="slots-editor-grid">
+                            <!-- 8 個圓點按鈕 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 技能編輯區 -->
+            <div id="skills-editor-panel" class="editor-card" style="display: none;">
+                <div class="panel-title">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    技能屬性編輯
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="skill-id-input">技能 ID</label>
+                        <input type="text" id="skill-id-input" class="input-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="skill-type-input">技能類型代號 (英文)</label>
+                        <input type="text" id="skill-type-input" class="input-control" placeholder="例如 damage, heal" oninput="updateCurrentSkillData()">
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="skill-text-input">顯示文字 (中文名稱)</label>
+                        <input type="text" id="skill-text-input" class="input-control" placeholder="例如 攻擊" oninput="updateCurrentSkillData()">
+                    </div>
+                    
+                    <!-- 漸層色彩 A -->
+                    <div class="form-group">
+                        <label>漸層色彩 A (Hex 格式)</label>
+                        <div class="color-inputs-pair">
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="skill-color-a-picker" class="color-picker-input" oninput="syncColorPickerToHex('a')">
+                            </div>
+                            <div class="hex-input-prefix">
+                                <input type="text" id="skill-color-a-input" class="input-control" maxlength="6" placeholder="e.g. e0d088" oninput="syncHexToColorPicker('a')">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 漸層色彩 B -->
+                    <div class="form-group">
+                        <label>漸層色彩 B (Hex 格式)</label>
+                        <div class="color-inputs-pair">
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="skill-color-b-picker" class="color-picker-input" oninput="syncColorPickerToHex('b')">
+                            </div>
+                            <div class="hex-input-prefix">
+                                <input type="text" id="skill-color-b-input" class="input-control" maxlength="6" placeholder="e.g. f0cd29" oninput="syncHexToColorPicker('b')">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側即時預覽區 -->
+        <div class="preview-area">
+            <div class="preview-header" id="preview-header-text">卡牌即時預覽</div>
+            
+            <div id="preview-container">
+                <!-- JavaScript 動態渲染 -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast 彈出視窗 -->
+    <div id="toast-notify" class="toast">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span id="toast-message">儲存成功！</span>
+    </div>
+
+    <script>
+        // 資料狀態
+        let cardsData = [];
+        let skillsData = [];
+        let texturesData = [];
+        
+        let currentTab = 'cards';
+        let selectedId = null;
+        let isDirty = false;
+
+        // 初始化
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadData();
+            
+            document.getElementById('btn-save-all').addEventListener('click', saveAllChanges);
+            
+            // 監聽網頁卸載與分頁關閉事件 ── 自動送出銷毀 API 信號
+            window.addEventListener('pagehide', () => {
+                navigator.sendBeacon('/api/shutdown');
+            });
+            
+            // 關閉前防呆提示
+            window.addEventListener('beforeunload', (e) => {
+                if (isDirty) {
+                    e.preventDefault();
+                    e.returnValue = '您有尚未儲存的修改，確定要離開嗎？';
+                }
+            });
+        });
+
+        // 載入資料
+        async function loadData() {
+            try {
+                const [cardsRes, skillsRes, texturesRes] = await Promise.all([
+                    fetch('/api/cards').then(r => r.json()),
+                    fetch('/api/skills').then(r => r.json()),
+                    fetch('/api/textures').then(r => r.json())
+                ]);
+
+                cardsData = cardsRes;
+                skillsData = skillsRes;
+                texturesData = texturesRes;
+
+                populateDropdowns();
+
+                if (cardsData.length > 0) {
+                    selectedId = cardsData[0].card_id;
+                }
+                
+                isDirty = false;
+                updateSaveButtonState();
+                
+                switchTab('cards');
+            } catch (err) {
+                console.error("載入資料失敗:", err);
+                alert("無法從伺服器載入 CSV 資料。請確認背景 Python 伺服器是否正在運作。");
+            }
+        }
+
+        // 動態生成下拉選單選項
+        function populateDropdowns() {
+            const skillA = document.getElementById('card-skill-a-select');
+            const skillB = document.getElementById('card-skill-b-select');
+            const iconSelect = document.getElementById('card-icon-select');
+
+            const skillOptions = skillsData.map(s => 
+                `<option value="${s.skill_id}">${s.display_text} (ID: ${s.skill_id}, 類型: ${s.skill_type})</option>`
+            ).join('');
+            
+            skillA.innerHTML = skillOptions;
+            skillB.innerHTML = skillOptions;
+
+            const iconOptions = texturesData.map(t => 
+                `<option value="${t}">${t}</option>`
+            ).join('');
+            iconSelect.innerHTML = `<option value="">-- 無 (不使用貼圖) --</option>` + iconOptions;
+        }
+
+        // 切換頁籤
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            document.getElementById('tab-cards-btn').classList.toggle('active', tab === 'cards');
+            document.getElementById('tab-skills-btn').classList.toggle('active', tab === 'skills');
+            
+            document.getElementById('cards-editor-panel').style.display = tab === 'cards' ? 'block' : 'none';
+            document.getElementById('skills-editor-panel').style.display = tab === 'skills' ? 'block' : 'none';
+            
+            document.getElementById('preview-header-text').textContent = tab === 'cards' ? '卡牌即時預覽' : '技能標籤預覽';
+
+            const dataset = tab === 'cards' ? cardsData : skillsData;
+            const idKey = tab === 'cards' ? 'card_id' : 'skill_id';
+            
+            if (dataset.length > 0) {
+                const exists = dataset.some(x => x[idKey] == selectedId);
+                if (!exists) {
+                    selectedId = dataset[0][idKey];
+                }
+            } else {
+                selectedId = null;
+            }
+
+            document.getElementById('search-input').value = '';
+            renderList();
+            loadSelectedItem();
+        }
+
+        // 渲染列表清單
+        function renderList() {
+            const container = document.getElementById('list-container');
+            const searchQuery = document.getElementById('search-input').value.toLowerCase();
+            container.innerHTML = '';
+
+            if (currentTab === 'cards') {
+                const filteredCards = cardsData.filter(c => 
+                    c.name.toLowerCase().includes(searchQuery) || 
+                    c.card_id.toString().includes(searchQuery)
+                );
+
+                if (filteredCards.length === 0) {
+                    container.innerHTML = `<div class="empty-state">找不到符合的卡牌</div>`;
+                    return;
+                }
+
+                filteredCards.forEach(card => {
+                    const isSelected = card.card_id == selectedId;
+                    const item = document.createElement('div');
+                    item.className = `list-item ${isSelected ? 'selected' : ''}`;
+                    item.onclick = () => selectItem(card.card_id);
+
+                    const skillInfo = getSkillInfo(card.skill_a_id);
+                    const skillName = skillInfo ? skillInfo.display_text : `技能 ${card.skill_a_id}`;
+
+                    const imgPath = card.icon ? `/assets/textures/${card.icon}` : '';
+
+                    item.innerHTML = `
+                        <div class="item-info">
+                            <div class="item-avatar">
+                                ${card.icon ? `<img src="${imgPath}" alt="">` : '<span class="item-avatar-fallback">?</span>'}
+                            </div>
+                            <div class="item-text">
+                                <div class="item-name">${card.name || '未命名'}</div>
+                                <div class="item-sub">ID: ${card.card_id} | 技能 A: ${skillName} (${card.skill_a_value})</div>
+                            </div>
+                        </div>
+                        <button class="btn-delete" onclick="deleteItem(event, '${card.card_id}')" title="刪除卡牌">
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                            </svg>
+                        </button>
+                    `;
+                    container.appendChild(item);
+                });
+            } else {
+                const filteredSkills = skillsData.filter(s => 
+                    s.display_text.toLowerCase().includes(searchQuery) || 
+                    s.skill_type.toLowerCase().includes(searchQuery) ||
+                    s.skill_id.toString().includes(searchQuery)
+                );
+
+                if (filteredSkills.length === 0) {
+                    container.innerHTML = `<div class="empty-state">找不到符合的技能</div>`;
+                    return;
+                }
+
+                filteredSkills.forEach(skill => {
+                    const isSelected = skill.skill_id == selectedId;
+                    const item = document.createElement('div');
+                    item.className = `list-item ${isSelected ? 'selected' : ''}`;
+                    item.onclick = () => selectItem(skill.skill_id);
+
+                    const colorA = skill.color_a.startsWith('#') ? skill.color_a : `#${skill.color_a}`;
+                    const colorB = skill.color_b.startsWith('#') ? skill.color_b : `#${skill.color_b}`;
+                    const colorStyle = `background: linear-gradient(135deg, ${colorA}, ${colorB})`;
+
+                    item.innerHTML = `
+                        <div class="item-info">
+                            <div class="item-avatar" style="${colorStyle}; border: 1px solid rgba(255,255,255,0.2)">
+                                <span class="item-avatar-fallback" style="color: #fff; font-size: 11px;">⚡</span>
+                            </div>
+                            <div class="item-text">
+                                <div class="item-name">${skill.display_text || '未命名'}</div>
+                                <div class="item-sub">ID: ${skill.skill_id} | 類型: ${skill.skill_type}</div>
+                            </div>
+                        </div>
+                        <button class="btn-delete" onclick="deleteItem(event, '${skill.skill_id}')" title="刪除技能">
+                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                            </svg>
+                        </button>
+                    `;
+                    container.appendChild(item);
+                });
+            }
+        }
+
+        function filterList() {
+            renderList();
+        }
+
+        function selectItem(id) {
+            selectedId = id;
+            
+            const items = document.querySelectorAll('.list-item');
+            items.forEach(el => el.classList.remove('selected'));
+            
+            renderList();
+            loadSelectedItem();
+        }
+
+        // 載入所選項目資料到表單
+        function loadSelectedItem() {
+            if (selectedId === null) {
+                clearForms();
+                renderPreview();
+                return;
+            }
+
+            if (currentTab === 'cards') {
+                const card = cardsData.find(c => c.card_id == selectedId);
+                if (!card) return;
+
+                document.getElementById('card-id-input').value = card.card_id;
+                document.getElementById('card-name-input').value = card.name;
+                document.getElementById('card-skill-a-select').value = card.skill_a_id;
+                document.getElementById('card-skill-a-val').value = card.skill_a_value;
+                document.getElementById('card-skill-b-select').value = card.skill_b_id;
+                document.getElementById('card-skill-b-val').value = card.skill_b_value;
+                document.getElementById('card-icon-select').value = card.icon;
+
+                renderSlotsEditor(card.slots);
+            } else {
+                const skill = skillsData.find(s => s.skill_id == selectedId);
+                if (!skill) return;
+
+                document.getElementById('skill-id-input').value = skill.skill_id;
+                document.getElementById('skill-type-input').value = skill.skill_type;
+                document.getElementById('skill-text-input').value = skill.display_text;
+
+                const colorA = cleanColorHash(skill.color_a);
+                document.getElementById('skill-color-a-input').value = colorA;
+                document.getElementById('skill-color-a-picker').value = `#${colorA}`;
+
+                const colorB = cleanColorHash(skill.color_b);
+                document.getElementById('skill-color-b-input').value = colorB;
+                document.getElementById('skill-color-b-picker').value = `#${colorB}`;
+            }
+
+            renderPreview();
+        }
+
+        function clearForms() {
+            document.getElementById('card-id-input').value = '';
+            document.getElementById('card-name-input').value = '';
+            document.getElementById('card-skill-a-val').value = '';
+            document.getElementById('card-skill-b-val').value = '';
+            document.getElementById('card-icon-select').value = '';
+            document.getElementById('slots-editor-grid').innerHTML = '';
+            
+            document.getElementById('skill-id-input').value = '';
+            document.getElementById('skill-type-input').value = '';
+            document.getElementById('skill-text-input').value = '';
+            document.getElementById('skill-color-a-input').value = '';
+            document.getElementById('skill-color-b-input').value = '';
+        }
+
+        function getSkillInfo(skillId) {
+            return skillsData.find(s => s.skill_id == skillId) || null;
+        }
+
+        function cleanColorHash(colStr) {
+            if (!colStr) return "ffffff";
+            return colStr.replace('#', '').trim();
+        }
+
+        // 色彩雙向同步
+        function syncColorPickerToHex(pickerSuffix) {
+            const picker = document.getElementById(`skill-color-${pickerSuffix}-picker`);
+            const textInput = document.getElementById(`skill-color-${pickerSuffix}-input`);
+            
+            const hex = picker.value.substring(1);
+            textInput.value = hex;
+
+            updateCurrentSkillData();
+        }
+
+        function syncHexToColorPicker(pickerSuffix) {
+            const textInput = document.getElementById(`skill-color-${pickerSuffix}-input`);
+            const picker = document.getElementById(`skill-color-${pickerSuffix}-picker`);
+            
+            let val = textInput.value.trim().replace('#', '');
+            
+            if (val.length === 6 && /^[0-9A-Fa-f]{6}$/.test(val)) {
+                picker.value = `#${val}`;
+                updateCurrentSkillData();
+            }
+        }
+
+        // Slots 編輯與渲染（已包含最新的連續點擊 Bug 修正）
+        function renderSlotsEditor(slotsStr) {
+            const grid = document.getElementById('slots-editor-grid');
+            grid.innerHTML = '';
+
+            let normalizedStr = slotsStr || "00000000";
+            while (normalizedStr.length < 8) normalizedStr = "0" + normalizedStr;
+            if (normalizedStr.length > 8) normalizedStr = normalizedStr.substring(0, 8);
+
+            for (let i = 0; i < 8; i++) {
+                const bit = normalizedStr[i];
+                const btn = document.createElement('button');
+                btn.className = `slot-dot-btn ${bit === '1' ? 'active' : ''}`;
+                btn.textContent = `${i + 1}`;
+                btn.title = `切換插槽 ${i + 1}`;
+                btn.onclick = () => {
+                    const currentCard = cardsData.find(c => c.card_id == selectedId);
+                    if (!currentCard) return;
+
+                    // 每次點擊都實時獲取卡牌最新 state，防止閉包鎖死舊字串
+                    let currentSlots = currentCard.slots || "00000000";
+                    while (currentSlots.length < 8) currentSlots = "0" + currentSlots;
+                    if (currentSlots.length > 8) currentSlots = currentSlots.substring(0, 8);
+
+                    let arr = currentSlots.split('');
+                    arr[i] = arr[i] === '1' ? '0' : '1';
+                    const newSlotsStr = arr.join('');
+                    
+                    currentCard.slots = newSlotsStr;
+                    renderSlotsEditor(newSlotsStr); // 重新生成按鈕
+                    
+                    isDirty = true;
+                    updateSaveButtonState();
+                    renderPreview();
+                };
+                grid.appendChild(btn);
+            }
+        }
+
+        // 同步回暫存資料庫
+        function updateCurrentCardData() {
+            if (selectedId === null) return;
+            const card = cardsData.find(c => c.card_id == selectedId);
+            if (!card) return;
+
+            card.name = document.getElementById('card-name-input').value;
+            card.skill_a_id = document.getElementById('card-skill-a-select').value;
+            card.skill_a_value = document.getElementById('card-skill-a-val').value;
+            card.skill_b_id = document.getElementById('card-skill-b-select').value;
+            card.skill_b_value = document.getElementById('card-skill-b-val').value;
+            card.icon = document.getElementById('card-icon-select').value;
+
+            const currentItem = document.querySelector(`.list-item.selected .item-name`);
+            if (currentItem) currentItem.textContent = card.name || '未命名';
+            
+            const currentSub = document.querySelector(`.list-item.selected .item-sub`);
+            if (currentSub) {
+                const skillInfo = getSkillInfo(card.skill_a_id);
+                const skillName = skillInfo ? skillInfo.display_text : `技能 ${card.skill_a_id}`;
+                currentSub.textContent = `ID: ${card.card_id} | 技能 A: ${skillName} (${card.skill_a_value})`;
+            }
+
+            const currentAvatar = document.querySelector(`.list-item.selected .item-avatar`);
+            if (currentAvatar) {
+                currentAvatar.innerHTML = card.icon 
+                    ? `<img src="/assets/textures/${card.icon}" alt="">` 
+                    : '<span class="item-avatar-fallback">?</span>';
+            }
+
+            isDirty = true;
+            updateSaveButtonState();
+            renderPreview();
+        }
+
+        function updateCurrentSkillData() {
+            if (selectedId === null) return;
+            const skill = skillsData.find(s => s.skill_id == selectedId);
+            if (!skill) return;
+
+            skill.skill_type = document.getElementById('skill-type-input').value;
+            skill.display_text = document.getElementById('skill-text-input').value;
+            skill.color_a = document.getElementById('skill-color-a-input').value.trim();
+            skill.color_b = document.getElementById('skill-color-b-input').value.trim();
+
+            const currentItem = document.querySelector(`.list-item.selected .item-name`);
+            if (currentItem) currentItem.textContent = skill.display_text || '未命名';
+
+            const currentSub = document.querySelector(`.list-item.selected .item-sub`);
+            if (currentSub) currentSub.textContent = `ID: ${skill.skill_id} | 類型: ${skill.skill_type}`;
+
+            const currentAvatar = document.querySelector(`.list-item.selected .item-avatar`);
+            if (currentAvatar) {
+                const colorA = skill.color_a.startsWith('#') ? skill.color_a : `#${skill.color_a}`;
+                const colorB = skill.color_b.startsWith('#') ? skill.color_b : `#${skill.color_b}`;
+                currentAvatar.style.background = `linear-gradient(135deg, ${colorA}, ${colorB})`;
+            }
+
+            populateDropdowns();
+            if (cardsData.length > 0) {
+                const card = cardsData.find(c => c.card_id == document.getElementById('card-id-input').value);
+                if (card) {
+                    document.getElementById('card-skill-a-select').value = card.skill_a_id;
+                    document.getElementById('card-skill-b-select').value = card.skill_b_id;
+                }
+            }
+
+            isDirty = true;
+            updateSaveButtonState();
+            renderPreview();
+        }
+
+        // 新增 / 刪除
+        function addNewItem() {
+            if (currentTab === 'cards') {
+                const maxId = cardsData.reduce((max, c) => Math.max(max, parseInt(c.card_id) || 0), 0);
+                const newId = maxId + 1;
+
+                const newCard = {
+                    card_id: newId.toString(),
+                    name: `NewCard_${newId}`,
+                    skill_a_id: skillsData.length > 0 ? skillsData[0].skill_id : "1",
+                    skill_a_value: "5",
+                    skill_b_id: skillsData.length > 0 ? skillsData[0].skill_id : "1",
+                    skill_b_value: "10",
+                    slots: "00000000",
+                    icon: ""
+                };
+
+                cardsData.push(newCard);
+                selectedId = newCard.card_id;
+            } else {
+                const maxId = skillsData.reduce((max, s) => Math.max(max, parseInt(s.skill_id) || 0), 0);
+                const newId = maxId + 1;
+
+                const newSkill = {
+                    skill_id: newId.toString(),
+                    skill_type: "damage",
+                    display_text: `新技能_${newId}`,
+                    color_a: "888888",
+                    color_b: "555555"
+                };
+
+                skillsData.push(newSkill);
+                selectedId = newSkill.skill_id;
+                
+                populateDropdowns();
+            }
+
+            isDirty = true;
+            updateSaveButtonState();
+            renderList();
+            loadSelectedItem();
+
+            setTimeout(() => {
+                const list = document.getElementById('list-container');
+                list.scrollTop = list.scrollHeight;
+            }, 100);
+        }
+
+        function deleteItem(event, id) {
+            event.stopPropagation();
+
+            const confirmMsg = currentTab === 'cards' 
+                ? `確定要刪除卡牌 ID: ${id} 嗎？` 
+                : `確定要刪除技能 ID: ${id} 嗎？此動作若被儲存，使用此技能的卡牌可能會受影響！`;
+            
+            if (!confirm(confirmMsg)) return;
+
+            if (currentTab === 'cards') {
+                const idx = cardsData.findIndex(c => c.card_id == id);
+                if (idx !== -1) {
+                    cardsData.splice(idx, 1);
+                }
+            } else {
+                const idx = skillsData.findIndex(s => s.skill_id == id);
+                if (idx !== -1) {
+                    skillsData.splice(idx, 1);
+                }
+                populateDropdowns();
+            }
+
+            if (selectedId == id) {
+                const dataset = currentTab === 'cards' ? cardsData : skillsData;
+                const idKey = currentTab === 'cards' ? 'card_id' : 'skill_id';
+                selectedId = dataset.length > 0 ? dataset[0][idKey] : null;
+            }
+
+            isDirty = true;
+            updateSaveButtonState();
+            renderList();
+            loadSelectedItem();
+        }
+
+        // 渲染右側預覽畫面
+        function renderPreview() {
+            const previewContainer = document.getElementById('preview-container');
+            previewContainer.innerHTML = '';
+
+            if (selectedId === null) {
+                previewContainer.innerHTML = `<div class="empty-state">請選擇左側項目以進行預覽</div>`;
+                return;
+            }
+
+            if (currentTab === 'cards') {
+                const card = cardsData.find(c => c.card_id == selectedId);
+                if (!card) return;
+
+                const skillA = getSkillInfo(card.skill_a_id);
+                const skillB = getSkillInfo(card.skill_b_id);
+
+                const colorA_1 = skillA ? cleanColorHash(skillA.color_a) : "777";
+                const colorA_2 = skillA ? cleanColorHash(skillA.color_b) : "555";
+                const colorB_1 = skillB ? cleanColorHash(skillB.color_a) : "777";
+                const colorB_2 = skillB ? cleanColorHash(skillB.color_b) : "555";
+
+                const styleA = `background: linear-gradient(135deg, #${colorA_1}, #${colorA_2})`;
+                const styleB = `background: linear-gradient(135deg, #${colorB_1}, #${colorB_2})`;
+
+                let slotsStr = card.slots || "00000000";
+                while (slotsStr.length < 8) slotsStr = "0" + slotsStr;
+                let slotsHtml = "";
+                for (let ch of slotsStr) {
+                    slotsHtml += `<div class="preview-slot-dot ${ch === '1' ? 'active' : ''}"></div>`;
+                }
+
+                const imgUrl = card.icon ? `/assets/textures/${card.icon}` : '';
+
+                previewContainer.innerHTML = `
+                    <div class="game-card-wrapper">
+                        <div class="game-card">
+                            <div class="card-preview-top">
+                                <div class="card-preview-name">${card.name || '未命名'}</div>
+                                <div class="card-preview-id">ID: ${card.card_id}</div>
+                            </div>
+                            
+                            <div class="card-preview-image-box">
+                                ${card.icon 
+                                    ? `<img src="${imgUrl}" alt="${card.name}">` 
+                                    : `<span class="card-preview-image-fallback">🐾</span>`}
+                            </div>
+                            
+                            <div class="card-preview-skills">
+                                <div class="skill-badge" style="${styleA}">
+                                    <span>${skillA ? skillA.display_text : '無技能 A'}</span>
+                                    <span class="skill-badge-value">${card.skill_a_value || '0'}</span>
+                                </div>
+                                <div class="skill-badge" style="${styleB}">
+                                    <span>${skillB ? skillB.display_text : '無技能 B'}</span>
+                                    <span class="skill-badge-value">${card.skill_b_value || '0'}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="card-preview-slots">
+                                ${slotsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const skill = skillsData.find(s => s.skill_id == selectedId);
+                if (!skill) return;
+
+                const colorA = cleanColorHash(skill.color_a);
+                const colorB = cleanColorHash(skill.color_b);
+                const style = `background: linear-gradient(135deg, #${colorA}, #${colorB})`;
+
+                previewContainer.innerHTML = `
+                    <div class="skill-preview-card">
+                        <div class="skill-tag-preview" style="${style}">
+                            ${skill.display_text || '無顯示名稱'}
+                        </div>
+                        <div class="skill-preview-info">
+                            <div><strong>ID:</strong> ${skill.skill_id}</div>
+                            <div><strong>類型代號:</strong> ${skill.skill_type}</div>
+                            <div><strong>漸層起點:</strong> #${colorA}</div>
+                            <div><strong>漸層終點:</strong> #${colorB}</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // 儲存狀態更新
+        function updateSaveButtonState() {
+            const btn = document.getElementById('btn-save-all');
+            const status = document.getElementById('save-status');
+
+            if (isDirty) {
+                btn.classList.add('dirty');
+                status.textContent = '有尚未儲存的變更 (*)';
+                status.style.color = 'var(--accent-warning)';
+            } else {
+                btn.classList.remove('dirty');
+                status.textContent = '所有變更已儲存';
+                status.style.color = 'var(--text-muted)';
+            }
+        }
+
+        // 儲存資料回後端
+        async function saveAllChanges() {
+            const btn = document.getElementById('btn-save-all');
+            btn.disabled = true;
+            btn.textContent = '正在儲存...';
+
+            try {
+                const [cardsRes, skillsRes] = await Promise.all([
+                    fetch('/api/cards', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(cardsData)
+                    }).then(r => r.json()),
+                    
+                    fetch('/api/skills', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(skillsData)
+                    }).then(r => r.json())
+                ]);
+
+                if (cardsRes.error || skillsRes.error) {
+                    throw new Error(cardsRes.error || skillsRes.error);
+                }
+
+                isDirty = false;
+                updateSaveButtonState();
+                showToast("資料庫儲存成功！");
+            } catch (err) {
+                console.error("儲存失敗:", err);
+                alert("儲存變更失敗: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11 2H9v3h2V2Z"/>
+                        <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v13A1.5 1.5 0 0 0 1.5 16h13a1.5 1.5 0 0 0 1.5-1.5V2.914a1.5 1.5 0 0 0-.44-1.06L14.146.439A1.5 1.5 0 0 0 13.086 0H1.5ZM4 6a1 1 0 0 1-1-1V1h10v4a1 1 0 0 1-1 1H4ZM3 9h10a1 1 0 0 1 1 1v5H2v-5a1 1 0 0 1 1-1Z"/>
+                    </svg>
+                    儲存所有變更
+                `;
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast-notify');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

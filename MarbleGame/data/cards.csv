@@ -6,6 +6,6 @@ card_id,name,skill_a_id,skill_a_value,skill_b_id,skill_b_value,slots,icon
 5,大腸麵線,1,10,2,11,11110000,Food/Food_IntestineNoodles.png
 6,糖葫蘆,1,7,2,14,01010101,Food/Food_Tanghulu.png
 7,珍珠奶茶,1,5,4,0,00011000,Food/Food_BobaMilkTea.png
-8,八寶冰,1,5,2,25,11000011,Food/Food_ShavedIce.png
+8,八寶冰,1,5,3,4,11000011,Food/Food_ShavedIce.png
 9,蛋餅,1,15,3,30,00001111,Food/Food_EggPancake.png
 10,熱狗,1,15,3,30,11110000,Food/Food_CornDog.png

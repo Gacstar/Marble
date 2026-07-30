@@ -1,0 +1,4 @@
+item_id,display_name,icon,cd_default,skill_id,skill_value
+1,Toy Dinosaur (玩具恐龍),Item/Item_Dinosaur.png,3,1,15
+2,Toilet Paper (衛生紙),Item/Item_ToiletPaper.png,4,1,25
+3,Yo-Yo (溜溜球),Item/Item_Yoyo.png,2,1,8

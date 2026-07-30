@@ -1,0 +1,2 @@
+enemy_id,display_name,max_hp,icon,item_ids
+1,Brat (小屁孩),300,Enemy/Enemy_Brat.png,"1,2,3"

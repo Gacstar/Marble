@@ -71,3 +71,7 @@ tags: [type/api-spec, module/combat-system, module/card-hand, module/physics-box
 
 ### 視覺狀態
 - **指示燈**: 包含一個半透明的 `MeshInstance3D`，用於顯示當前技能對應的洞口。
+
+## EnemyDataLoader.gd (敵人與道具卡資料載入器)
+### 靜態函式 (Static Methods)
+- `load_enemy(target_id: int) -> Dictionary`: 讀取 `enemies.csv`、`enemy_skills.csv` 與 `item_cards.csv`，將指定 ID 的敵人資料加載並組裝成一個 Dictionary，包含 `{ "display_name", "max_hp", "icon", "item_cards": Array[ItemCardResource] }`。

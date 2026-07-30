@@ -40,42 +40,25 @@ func _initialize_all_cards():
 func reset_combat():
 	player_hp = player_max_hp
 	
-	active_enemy = {
-		"name": "Brat (小屁孩)",
-		"icon": load("res://assets/textures/Enemy/Enemy_Brat.png"),
-		"hp": 300,
-		"max_hp": 300
-	}
-	
-	# 初始化敵方道具卡
-	var card1 = ItemCardResource.new()
-	card1.item_name = "Toy Dinosaur (玩具恐龍)"
-	card1.item_icon = load("res://assets/textures/Item/Item_Dinosaur.png")
-	card1.cd_default = 3
-	card1.cd = 3
-	card1.skill_value = 15
-	card1.skill_type = "damage"
-	card1.lock_turns = 0
-	
-	var card2 = ItemCardResource.new()
-	card2.item_name = "Toilet Paper (衛生紙)"
-	card2.item_icon = load("res://assets/textures/Item/Item_ToiletPaper.png")
-	card2.cd_default = 4
-	card2.cd = 4
-	card2.skill_value = 25
-	card2.skill_type = "damage"
-	card2.lock_turns = 0
-	
-	var card3 = ItemCardResource.new()
-	card3.item_name = "Yo-Yo (溜溜球)"
-	card3.item_icon = load("res://assets/textures/Item/Item_Yoyo.png")
-	card3.cd_default = 2
-	card3.cd = 2
-	card3.skill_value = 8
-	card3.skill_type = "damage"
-	card3.lock_turns = 0
-	
-	item_cards = [card1, card2, card3]
+	# 讀表載入 ID 為 1 的小屁孩敵人與其道具卡
+	var enemy_data := EnemyDataLoader.load_enemy(1)
+	if not enemy_data.is_empty():
+		active_enemy = {
+			"name": enemy_data["display_name"],
+			"icon": enemy_data["icon"],
+			"hp": enemy_data["max_hp"],
+			"max_hp": enemy_data["max_hp"]
+		}
+		item_cards = enemy_data["item_cards"]
+	else:
+		# 備用降級防呆（萬一 CSV 損毀或載入失敗）
+		active_enemy = {
+			"name": "Brat (小屁孩)",
+			"icon": load("res://assets/textures/Enemy/Enemy_Brat.png"),
+			"hp": 300,
+			"max_hp": 300
+		}
+		item_cards = []
 	
 	target_item_idx = 0
 	next_damage_multiplier = 1

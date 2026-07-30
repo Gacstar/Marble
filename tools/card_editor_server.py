@@ -16,6 +16,9 @@ ROOT_DIR = os.path.dirname(SCRIPT_DIR)
 
 CARDS_CSV = os.path.join(ROOT_DIR, "MarbleGame", "data", "cards.csv")
 SKILLS_CSV = os.path.join(ROOT_DIR, "MarbleGame", "data", "skills.csv")
+ENEMIES_CSV = os.path.join(ROOT_DIR, "MarbleGame", "data", "enemies.csv")
+ENEMY_SKILLS_CSV = os.path.join(ROOT_DIR, "MarbleGame", "data", "enemy_skills.csv")
+ITEM_CARDS_CSV = os.path.join(ROOT_DIR, "MarbleGame", "data", "item_cards.csv")
 TEXTURES_DIR = os.path.join(ROOT_DIR, "MarbleGame", "assets", "textures")
 HTML_FILE = os.path.join(SCRIPT_DIR, "card_editor.html")
 
@@ -24,6 +27,9 @@ PORT = 8000
 # 預先定義欄位名稱
 CARDS_HEADERS = ['card_id', 'name', 'skill_a_id', 'skill_a_value', 'skill_b_id', 'skill_b_value', 'slots', 'icon']
 SKILLS_HEADERS = ['skill_id', 'skill_type', 'display_text', 'color_a', 'color_b']
+ENEMIES_HEADERS = ['enemy_id', 'display_name', 'max_hp', 'icon', 'item_ids']
+ENEMY_SKILLS_HEADERS = ['skill_id', 'skill_type', 'display_text']
+ITEM_CARDS_HEADERS = ['item_id', 'display_name', 'icon', 'cd_default', 'skill_id', 'skill_value']
 
 class CardEditorHandler(BaseHTTPRequestHandler):
     def end_headers(self):
@@ -91,6 +97,48 @@ class CardEditorHandler(BaseHTTPRequestHandler):
                 self.send_json_response(200, skills)
             except Exception as e:
                 self.send_error_response(500, f"Error reading skills.csv: {str(e)}")
+            return
+
+        # 4. 獲取敵人清單 API
+        elif path == '/api/enemies':
+            try:
+                enemies = []
+                if os.path.exists(ENEMIES_CSV):
+                    with open(ENEMIES_CSV, mode='r', encoding='utf-8') as f:
+                        reader = csv.DictReader(f)
+                        for row in reader:
+                            enemies.append(row)
+                self.send_json_response(200, enemies)
+            except Exception as e:
+                self.send_error_response(500, f"Error reading enemies.csv: {str(e)}")
+            return
+
+        # 5. 獲取敵方技能清單 API
+        elif path == '/api/enemy_skills':
+            try:
+                skills = []
+                if os.path.exists(ENEMY_SKILLS_CSV):
+                    with open(ENEMY_SKILLS_CSV, mode='r', encoding='utf-8') as f:
+                        reader = csv.DictReader(f)
+                        for row in reader:
+                            skills.append(row)
+                self.send_json_response(200, skills)
+            except Exception as e:
+                self.send_error_response(500, f"Error reading enemy_skills.csv: {str(e)}")
+            return
+
+        # 6. 獲取敵方道具卡清單 API
+        elif path == '/api/item_cards':
+            try:
+                items = []
+                if os.path.exists(ITEM_CARDS_CSV):
+                    with open(ITEM_CARDS_CSV, mode='r', encoding='utf-8') as f:
+                        reader = csv.DictReader(f)
+                        for row in reader:
+                            items.append(row)
+                self.send_json_response(200, items)
+            except Exception as e:
+                self.send_error_response(500, f"Error reading item_cards.csv: {str(e)}")
             return
 
         # 4. 獲取可用圖示列表 API
@@ -239,6 +287,86 @@ class CardEditorHandler(BaseHTTPRequestHandler):
                 if os.path.exists(SKILLS_CSV + ".bak"):
                     shutil.copyfile(SKILLS_CSV + ".bak", SKILLS_CSV)
                 self.send_error_response(500, f"Failed to save skills CSV: {str(e)}")
+            return
+
+        # 3. 寫入敵人 API
+        elif path == '/api/enemies':
+            if not isinstance(data, list):
+                self.send_error_response(400, "Payload must be a list of enemies")
+                return
+            if os.path.exists(ENEMIES_CSV):
+                shutil.copyfile(ENEMIES_CSV, ENEMIES_CSV + ".bak")
+            try:
+                with open(ENEMIES_CSV, mode='w', encoding='utf-8', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(ENEMIES_HEADERS)
+                    for enemy in data:
+                        row = [
+                            str(enemy.get('enemy_id', '')).strip(),
+                            str(enemy.get('display_name', '')).strip(),
+                            str(enemy.get('max_hp', '')).strip(),
+                            str(enemy.get('icon', '')).strip(),
+                            str(enemy.get('item_ids', '')).strip()
+                        ]
+                        writer.writerow(row)
+                self.send_json_response(200, {"status": "ok", "message": "Enemies CSV updated successfully."})
+            except Exception as e:
+                if os.path.exists(ENEMIES_CSV + ".bak"):
+                    shutil.copyfile(ENEMIES_CSV + ".bak", ENEMIES_CSV)
+                self.send_error_response(500, f"Failed to save enemies CSV: {str(e)}")
+            return
+
+        # 4. 寫入敵方技能 API
+        elif path == '/api/enemy_skills':
+            if not isinstance(data, list):
+                self.send_error_response(400, "Payload must be a list of enemy skills")
+                return
+            if os.path.exists(ENEMY_SKILLS_CSV):
+                shutil.copyfile(ENEMY_SKILLS_CSV, ENEMY_SKILLS_CSV + ".bak")
+            try:
+                with open(ENEMY_SKILLS_CSV, mode='w', encoding='utf-8', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(ENEMY_SKILLS_HEADERS)
+                    for skill in data:
+                        row = [
+                            str(skill.get('skill_id', '')).strip(),
+                            str(skill.get('skill_type', '')).strip(),
+                            str(skill.get('display_text', '')).strip()
+                        ]
+                        writer.writerow(row)
+                self.send_json_response(200, {"status": "ok", "message": "Enemy Skills CSV updated successfully."})
+            except Exception as e:
+                if os.path.exists(ENEMY_SKILLS_CSV + ".bak"):
+                    shutil.copyfile(ENEMY_SKILLS_CSV + ".bak", ENEMY_SKILLS_CSV)
+                self.send_error_response(500, f"Failed to save enemy skills CSV: {str(e)}")
+            return
+
+        # 5. 寫入敵方道具卡 API
+        elif path == '/api/item_cards':
+            if not isinstance(data, list):
+                self.send_error_response(400, "Payload must be a list of item cards")
+                return
+            if os.path.exists(ITEM_CARDS_CSV):
+                shutil.copyfile(ITEM_CARDS_CSV, ITEM_CARDS_CSV + ".bak")
+            try:
+                with open(ITEM_CARDS_CSV, mode='w', encoding='utf-8', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(ITEM_CARDS_HEADERS)
+                    for item in data:
+                        row = [
+                            str(item.get('item_id', '')).strip(),
+                            str(item.get('display_name', '')).strip(),
+                            str(item.get('icon', '')).strip(),
+                            str(item.get('cd_default', '')).strip(),
+                            str(item.get('skill_id', '')).strip(),
+                            str(item.get('skill_value', '')).strip()
+                        ]
+                        writer.writerow(row)
+                self.send_json_response(200, {"status": "ok", "message": "Item Cards CSV updated successfully."})
+            except Exception as e:
+                if os.path.exists(ITEM_CARDS_CSV + ".bak"):
+                    shutil.copyfile(ITEM_CARDS_CSV + ".bak", ITEM_CARDS_CSV)
+                self.send_error_response(500, f"Failed to save item cards CSV: {str(e)}")
             return
 
         else:

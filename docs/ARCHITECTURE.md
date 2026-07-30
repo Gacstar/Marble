@@ -31,7 +31,7 @@ tags: [type/architecture, module/shader-perspective, module/combat-system, modul
 
 ## 4. 開發輔助工具 (Development Tools)
 - **卡牌與技能編輯器 (Card & Skill Editor):**
-    - **資料定位**: 遊戲卡牌配置 ([cards.csv](file:///d:/GodotProject/Marble/MarbleGame/gameplay/cards/food/cards.csv)) 與技能定義 ([skills.csv](file:///d:/GodotProject/Marble/MarbleGame/gameplay/cards/food/skills.csv)) 由 [CardDataLoader.gd](file:///d:/GodotProject/Marble/MarbleGame/gameplay/cards/food/CardDataLoader.gd) 靜態載入。
+    - **資料定位**: 遊戲卡牌、技能、敵人及敵方道具的 CSV 設定表已統一集中於 [data/](file:///d:/GodotProject/Marble/MarbleGame/data/) 資料夾下，並分別由 [CardDataLoader.gd](file:///d:/GodotProject/Marble/MarbleGame/gameplay/cards/food/CardDataLoader.gd) 與 [EnemyDataLoader.gd](file:///d:/GodotProject/Marble/MarbleGame/gameplay/combat/EnemyDataLoader.gd) 靜態載入。
     - **本地網頁工具**: 位於 [card_editor.html](file:///d:/GodotProject/Marble/tools/card_editor.html)，整合了卡牌即時預覽、中文技能下拉選單、PS 拾色器連動與 8-Slots 點亮編輯等進階 UI。
     - **快捷背景啟動與自我銷毀**:
         - 使用者在 Windows 檔案總管中雙擊根目錄的 [啟動卡牌編輯器.bat](file:///d:/GodotProject/Marble/啟動卡牌編輯器.bat) 便可在背景無感啟動一個 Python API 伺服器，自動彈出網頁，且完全不佔用 IDE 的 AI 代理人通道。

@@ -1,7 +1,7 @@
 class_name CardDataLoader
 
-const CARDS_PATH := "res://gameplay/cards/food/cards.csv"
-const SKILLS_PATH := "res://gameplay/cards/food/skills.csv"
+const CARDS_PATH := "res://data/cards.csv"
+const SKILLS_PATH := "res://data/skills.csv"
 const ICON_BASE_PATH := "res://assets/textures/"
 
 ## 讀取 skills.csv，回傳 { skill_id(int): { type, display, color_a, color_b } }

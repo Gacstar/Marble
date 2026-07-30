@@ -1,8 +1,8 @@
 class_name EnemyDataLoader
 
-const ENEMIES_PATH := "res://gameplay/combat/data/enemies.csv"
-const SKILLS_PATH := "res://gameplay/combat/data/enemy_skills.csv"
-const ITEMS_PATH := "res://gameplay/combat/data/item_cards.csv"
+const ENEMIES_PATH := "res://data/enemies.csv"
+const SKILLS_PATH := "res://data/enemy_skills.csv"
+const ITEMS_PATH := "res://data/item_cards.csv"
 const ICON_BASE_PATH := "res://assets/textures/"
 
 ## 讀取 enemy_skills.csv，回傳 { skill_id(int): { skill_type, display_text } }

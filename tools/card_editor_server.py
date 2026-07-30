@@ -14,8 +14,8 @@ import webbrowser
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(SCRIPT_DIR)
 
-CARDS_CSV = os.path.join(ROOT_DIR, "MarbleGame", "gameplay", "cards", "food", "cards.csv")
-SKILLS_CSV = os.path.join(ROOT_DIR, "MarbleGame", "gameplay", "cards", "food", "skills.csv")
+CARDS_CSV = os.path.join(ROOT_DIR, "MarbleGame", "data", "cards.csv")
+SKILLS_CSV = os.path.join(ROOT_DIR, "MarbleGame", "data", "skills.csv")
 TEXTURES_DIR = os.path.join(ROOT_DIR, "MarbleGame", "assets", "textures")
 HTML_FILE = os.path.join(SCRIPT_DIR, "card_editor.html")
 

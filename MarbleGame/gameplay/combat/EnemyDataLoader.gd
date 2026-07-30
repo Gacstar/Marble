@@ -13,13 +13,10 @@ static func _load_skills() -> Dictionary:
 		push_error("EnemyDataLoader: 無法開啟 enemy_skills.csv，錯誤碼: %d" % FileAccess.get_open_error())
 		return skills
 	
-	file.get_line() # 略過標題列
+	file.get_csv_line() # 略過標題列
 	while not file.eof_reached():
-		var line := file.get_line().strip_edges()
-		if line.is_empty():
-			continue
-		var cols := line.split(",")
-		if cols.size() < 3:
+		var cols := file.get_csv_line()
+		if cols.size() < 3 or cols[0].strip_edges().is_empty():
 			continue
 		
 		skills[int(cols[0])] = {
@@ -37,13 +34,10 @@ static func _load_items(skills: Dictionary) -> Dictionary:
 		push_error("EnemyDataLoader: 無法開啟 item_cards.csv，錯誤碼: %d" % FileAccess.get_open_error())
 		return items
 	
-	file.get_line() # 略過標題列
+	file.get_csv_line() # 略過標題列
 	while not file.eof_reached():
-		var line := file.get_line().strip_edges()
-		if line.is_empty():
-			continue
-		var cols := line.split(",")
-		if cols.size() < 6:
+		var cols := file.get_csv_line()
+		if cols.size() < 6 or cols[0].strip_edges().is_empty():
 			continue
 		
 		var item_id := int(cols[0])
@@ -77,13 +71,10 @@ static func load_enemy(target_id: int) -> Dictionary:
 		push_error("EnemyDataLoader: 無法開啟 enemies.csv，錯誤碼: %d" % FileAccess.get_open_error())
 		return enemy_data
 	
-	file.get_line() # 略過標題列
+	file.get_csv_line() # 略過標題列
 	while not file.eof_reached():
-		var line := file.get_line().strip_edges()
-		if line.is_empty():
-			continue
-		var cols := line.split(",")
-		if cols.size() < 5:
+		var cols := file.get_csv_line()
+		if cols.size() < 5 or cols[0].strip_edges().is_empty():
 			continue
 		
 		var enemy_id := int(cols[0])
@@ -92,9 +83,8 @@ static func load_enemy(target_id: int) -> Dictionary:
 			enemy_data["max_hp"] = int(cols[2])
 			enemy_data["icon"] = load(ICON_BASE_PATH + cols[3].strip_edges())
 			
-			# 解析並載入道具卡
+			# 解析並載入道具卡 (get_csv_line 會自動去除雙引號，得到乾淨的 "1,2,3")
 			var item_ids_str := cols[4].strip_edges()
-			item_ids_str = item_ids_str.replace("\"", "") # 清理雙引號
 			var item_ids := item_ids_str.split(",")
 			
 			var enemy_item_cards: Array[ItemCardResource] = []

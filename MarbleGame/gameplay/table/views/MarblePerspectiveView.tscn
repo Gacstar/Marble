@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://djcyrrtp3tuxd"]
 
-[ext_resource type="Script" path="res://gameplay/table/views/ViewportInputHandler.gd" id="1"]
+[ext_resource type="Script" uid="uid://dlsgvepa05mb3" path="res://gameplay/table/views/ViewportInputHandler.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://cuegkp7kb7m1s" path="res://gameplay/table/MarbleTable.tscn" id="2"]
-[ext_resource type="Script" path="res://gameplay/table/views/PerspectiveViewController.gd" id="3"]
+[ext_resource type="Script" uid="uid://bu4icje3pr5b6" path="res://gameplay/table/views/PerspectiveViewController.gd" id="3"]
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_5wuej"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_3kq55"]
 viewport_path = NodePath("SubViewport/WorldRoot/TableViewport")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qdnck"]
 shading_mode = 0
-albedo_texture = SubResource("ViewportTexture_5wuej")
+albedo_texture = SubResource("ViewportTexture_3kq55")
 
 [sub_resource type="QuadMesh" id="7"]
 size = Vector2(4.57, 8.14)

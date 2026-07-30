@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dcdrjwxdredbb"]
 
 [ext_resource type="Script" uid="uid://bbo55pst154p5" path="res://gameplay/combat/CombatUI.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://coyvs4qwm6qxc" path="res://assets/textures/cat_player.jpg" id="2_cat"]
+[ext_resource type="Texture2D" uid="uid://dvxw7kqy3wdbe" path="res://assets/textures/Player.png" id="2_cat"]
 [ext_resource type="Script" path="res://gameplay/combat/SkillDirector.gd" id="3_skill_director"]
 
 [node name="CombatUI" type="CanvasLayer" unique_id=1445871488]
@@ -28,7 +28,7 @@ grow_horizontal = 2
 texture = ExtResource("2_cat")
 expand_mode = 1
 stretch_mode = 5
-flip_h = true
+flip_h = false
 
 [node name="ProgressBar" type="ProgressBar" parent="PlayerSide" unique_id=1804972826]
 layout_mode = 1

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://be1twomkgkhap" path="res://gameplay/table/components/Ball.gd" id="1_script"]
 
-[ext_resource type="Texture2D" uid="uid://dnbpwnnly6tca" path="res://assets/textures/cartoon_marble.png" id="2_texture"]
+[ext_resource type="Texture2D" uid="uid://ctabnt0nyrv46" path="res://assets/textures/Marble.png" id="2_texture"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_1"]
 friction = 0.1

@@ -41,16 +41,16 @@ func reset_combat():
 	player_hp = player_max_hp
 	
 	active_enemy = {
-		"name": "Brat (奧客小鬼)",
-		"icon": load("res://assets/textures/enemy_placeholder.jpg"),
+		"name": "Brat (小屁孩)",
+		"icon": load("res://assets/textures/Enemy/Enemy_Brat.png"),
 		"hp": 300,
 		"max_hp": 300
 	}
 	
 	# 初始化敵方道具卡
 	var card1 = ItemCardResource.new()
-	card1.item_name = "Water Balloon (水球)"
-	card1.item_icon = load("res://assets/textures/owl_icon.jpg")
+	card1.item_name = "Toy Dinosaur (玩具恐龍)"
+	card1.item_icon = load("res://assets/textures/Item/Item_Dinosaur.png")
 	card1.cd_default = 3
 	card1.cd = 3
 	card1.skill_value = 15
@@ -58,8 +58,8 @@ func reset_combat():
 	card1.lock_turns = 0
 	
 	var card2 = ItemCardResource.new()
-	card2.item_name = "Stink Bomb (臭彈)"
-	card2.item_icon = load("res://assets/textures/bear_icon.jpg")
+	card2.item_name = "Toilet Paper (衛生紙)"
+	card2.item_icon = load("res://assets/textures/Item/Item_ToiletPaper.png")
 	card2.cd_default = 4
 	card2.cd = 4
 	card2.skill_value = 25
@@ -67,8 +67,8 @@ func reset_combat():
 	card2.lock_turns = 0
 	
 	var card3 = ItemCardResource.new()
-	card3.item_name = "Screaming (尖叫)"
-	card3.item_icon = load("res://assets/textures/tiger_icon.jpg")
+	card3.item_name = "Yo-Yo (溜溜球)"
+	card3.item_icon = load("res://assets/textures/Item/Item_Yoyo.png")
 	card3.cd_default = 2
 	card3.cd = 2
 	card3.skill_value = 8

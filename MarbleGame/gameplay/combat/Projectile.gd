@@ -11,7 +11,7 @@ func setup(start_pos: Vector2, target_pos: Vector2, texture_resource: Texture2D 
 		texture = texture_resource
 	else:
 		# 預設使用卡通彈珠貼圖
-		texture = load("res://assets/textures/cartoon_marble.png")
+		texture = load("res://assets/textures/Marble.png")
 	
 	# 初始位置居中於起點
 	global_position = start_pos - pivot_offset

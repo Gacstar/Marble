@@ -100,8 +100,14 @@ class CardEditorHandler(BaseHTTPRequestHandler):
                 return
             
             try:
-                files = os.listdir(TEXTURES_DIR)
-                images = [f for f in files if f.lower().endswith(('.png', '.jpg', '.jpeg')) and not f.endswith('.import')]
+                images = []
+                for root, dirs, files in os.walk(TEXTURES_DIR):
+                    for f in files:
+                        if f.lower().endswith(('.png', '.jpg', '.jpeg')) and not f.endswith('.import'):
+                            full_path = os.path.join(root, f)
+                            rel_path = os.path.relpath(full_path, TEXTURES_DIR)
+                            # 統一使用正斜線作為 Godot 與 Web 的路徑分隔符
+                            images.append(rel_path.replace('\\', '/'))
                 images.sort()
                 self.send_json_response(200, images)
             except Exception as e:
@@ -112,10 +118,19 @@ class CardEditorHandler(BaseHTTPRequestHandler):
         elif path.startswith('/assets/textures/'):
             filename = path[len('/assets/textures/'):]
             filename = urllib.parse.unquote(filename)
-            filename = os.path.basename(filename)
             
-            file_path = os.path.join(TEXTURES_DIR, filename)
-            if not os.path.exists(file_path):
+            # 安全防護：禁止跨目錄讀取
+            if '..' in filename or filename.startswith('/') or filename.startswith('\\'):
+                self.send_error_response(400, "Invalid path")
+                return
+                
+            # 計算絕對路徑並確認仍在 TEXTURES_DIR 底下
+            file_path = os.path.normpath(os.path.join(TEXTURES_DIR, filename))
+            if not file_path.startswith(os.path.normpath(TEXTURES_DIR)):
+                self.send_error_response(403, "Access denied")
+                return
+                
+            if not os.path.exists(file_path) or os.path.isdir(file_path):
                 self.send_error_response(404, f"Texture not found: {filename}")
                 return
 

@@ -39,6 +39,8 @@ static func _create_skill_effect(type: String) -> BaseSkillEffect:
 			return SkillDelayCD.new()
 		"damage_buff":
 			return SkillDamageBuff.new()
+		"poison":
+			return SkillPoison.new()
 		"damage", _:
 			return SkillDamage.new()
 

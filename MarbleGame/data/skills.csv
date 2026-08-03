@@ -1,6 +1,7 @@
 skill_id,skill_type,display_text,color_a,color_b
 1,damage,攻擊,c7c7c7,c7c7c7
-2,heal,回復,35bf2e,35bf2e
+2,heal,回復,c7c7c7,35bf2e
 3,delay_cd,延緩,5a90d9,5a90d9
 4,damage_buff,蓄力,824bb5,824bb5
 5,damage,強攻,c33232,c33232
+6,poison,中毒,9c3cc9,9c3cc9

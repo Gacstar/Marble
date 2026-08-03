@@ -27,6 +27,7 @@ description: 交接協定與知識持久化。確保 AI 開發過程中的短期
 ## 3. 執行流程 (Execution Protocols)
 1.  **掃描變更**: 比對今日實作的程式碼與現有的 `API_SPEC.md` 是否一致。
 2.  **更新 Source of Truth**:
+    - **【三方一致性檢驗 (Triple Alignment Rule)】**：必須確認「設計文件 (GDD)」、「API 規格書 (API_SPEC.md)」與「實作代碼 (Code)」三者關於數值、機制和簽章的描述完全一致。若在實作中調整了參數或規則（例如將 5 珠改為 3 珠），必須在交接流程中一併將設計文件與規格書同步更新，杜絕文件脫節。
     - 如果新增了信號或方法，立即更新 `@/docs/API_SPEC.md`。
     - 如果調整了 UI 佈局，立即更新 `@/docs/ARCHITECTURE.md`。
     - **【大腦演化 ➔ Bug強制回饋】**：若本次開發遇到重大技術障礙或踩雷（如型別陣列失效、UID快取脫節、Box2D頂點問題），**必須強制將避坑對策寫入 `@/docs/PITFALLS.md`**，防止未來的 AI 重蹈覆轍，無謂消耗偵錯 Token。
@@ -46,3 +47,27 @@ description: 交接協定與知識持久化。確保 AI 開發過程中的短期
 - **核心指南**: 詳見 `[docs/PITFALLS.md](../../docs/PITFALLS.md#2-ui-佈局與信號)`。
 - **規範**: 必須使用相對路徑連結，且同步更新 API_SPEC 以免信號報錯。
 - **層級標籤語法**：新自訂的標籤建議使用 `大類/子類`（如 `module/card-hand/cd-freeze`）的結構，以便於 Obsidian 等工具自動生成精美層級的標籤樹形導航。
+
+## 5. 交接日誌標準模板 (Handover Log Template)
+每次撰寫交接日誌時，請遵循此高密度格式，並存檔於 `docs/logs/H_YYYYMMDD.md`：
+```markdown
+---
+tags: [handover-notes, module/your-module]
+---
+# 交接日誌 (YYYY/MM/DD)
+
+## 📌 Meta 極速交接 (30秒接軌摘要)
+- **核心狀態**：[一句話說明目前的開發進度/卡關點]
+- **下一代 AI 任務**：[明確的下一步行動指令]
+
+## 🛠️ 變更紀錄與連結
+- [x] [修改/新增的項目說明] ➔ 實作檔案：[Filename](file:///path/to/file)
+- [x] 規格與文件更新：已對齊 [API_SPEC.md](file:///path/to/docs/API_SPEC.md) 與 [GDD](file:///path/to/docs/Marble_GDD/MOC_GDD.md)
+
+## ⚠️ 踩雷與防禦 (Pitfalls)
+- **問題**：[遇到的問題或 Bug 描述]
+- **對策**：[如何解決，以及如何避免重複踩坑]
+
+## 📅 下一步規劃 (TODO)
+- [ ] [待辦事項]
+```

@@ -12,9 +12,11 @@ signal item_card_clicked(index)
 
 var item_index: int = 0
 var is_locked: bool = false
+var item_resource: ItemCardResource = null
 
 func setup(idx: int, resource: ItemCardResource, selected: bool):
 	item_index = idx
+	item_resource = resource
 	name_label.text = resource.item_name
 	icon_rect.texture = resource.item_icon
 	
@@ -31,6 +33,9 @@ func setup(idx: int, resource: ItemCardResource, selected: bool):
 		"heal":
 			desc_label.text = "[回復] +%d" % resource.skill_value
 			desc_label.add_theme_color_override("font_color", Color(0.3, 0.9, 0.4))
+		"poison":
+			desc_label.text = "[中毒] %d" % resource.skill_value
+			desc_label.add_theme_color_override("font_color", Color(0.73, 0.22, 1.0))
 		_:
 			desc_label.text = "[效果] %d" % resource.skill_value
 			desc_label.remove_theme_color_override("font_color")

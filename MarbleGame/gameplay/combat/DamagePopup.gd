@@ -1,9 +1,12 @@
 extends Label
 
-func setup(amount: int, is_heal: bool = false, is_player: bool = false):
+func setup(amount: int, is_heal: bool = false, is_player: bool = false, is_poison: bool = false):
 	if is_heal:
 		text = "+" + str(amount)
 		modulate = Color(0.2, 1.0, 0.2, 1.0) # 亮綠色
+	elif is_poison:
+		text = "-" + str(amount)
+		modulate = Color(0.73, 0.22, 1.0, 1.0) # 中毒紫色 (亮紫色)
 	else:
 		text = "-" + str(amount)
 		if is_player:

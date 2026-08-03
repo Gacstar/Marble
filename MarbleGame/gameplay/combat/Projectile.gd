@@ -1,8 +1,8 @@
 extends TextureRect
 
 func setup(start_pos: Vector2, target_pos: Vector2, texture_resource: Texture2D = null) -> Tween:
-	# 設定預設大小與中心點
-	custom_minimum_size = Vector2(48, 48)
+	# 設定預設大小與中心點 (放大 2 倍，原為 48, 48)
+	custom_minimum_size = Vector2(96, 96)
 	size = custom_minimum_size
 	pivot_offset = size / 2.0
 	
@@ -12,6 +12,10 @@ func setup(start_pos: Vector2, target_pos: Vector2, texture_resource: Texture2D 
 	else:
 		# 預設使用卡通彈珠貼圖
 		texture = load("res://assets/textures/Marble.png")
+	
+	# 確保貼圖保持長寬比並置中，旋轉時以貼圖中心為 pivot
+	expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	
 	# 初始位置居中於起點
 	global_position = start_pos - pivot_offset
@@ -23,8 +27,8 @@ func setup(start_pos: Vector2, target_pos: Vector2, texture_resource: Texture2D 
 	var flight_duration = 0.5 # 飛行半秒鐘
 	tween.tween_property(self, "global_position", target_pos - pivot_offset, flight_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	
-	# 2. 飛行時微幅旋轉，增強動感
-	var target_rot = rotation + (PI * 4 if randf() > 0.5 else -PI * 4) # 旋轉兩圈
+	# 2. 飛行時微幅旋轉，減慢速度 (改為只旋轉一圈)
+	var target_rot = rotation + (PI * 2 if randf() > 0.5 else -PI * 2)
 	tween.tween_property(self, "rotation", target_rot, flight_duration).set_trans(Tween.TRANS_LINEAR)
 	
 	# 3. 飛行時淡入 (從稍微透明到完全不透明)

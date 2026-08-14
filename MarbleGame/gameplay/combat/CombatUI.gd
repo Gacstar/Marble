@@ -54,18 +54,16 @@ func update_selection(selected_idx: int):
 		if i < current_hand.size():
 			food_card_widgets[i].setup(i, current_hand[i], i == current_selected_card_idx, current_multiplier)
 
-func update_ui(player_hp: int, p_max: int, enemy_data: Dictionary, item_cards_data: Array, target_item_idx: int, multiplier: int, skip_hp: bool = false):
+func update_ui(player_hp: int, p_max: int, enemy_data: Dictionary, item_cards_data: Array, target_item_idx: int, multiplier: int, player_poison_turns: int = 0, enemy_poison_turns: int = 0, skip_hp: bool = false):
 	current_multiplier = multiplier
-	
-	var cm = get_parent().combat_manager
 	
 	# 更新玩家 (老奶奶) HP UI
 	if not skip_hp:
 		player_hp_bar.max_value = p_max
 		player_hp_bar.value = player_hp
 		var p_text = "HP: %d / %d" % [player_hp, p_max]
-		if cm and cm.player_poison_turns > 0:
-			p_text += " (毒:%d)" % cm.player_poison_turns
+		if player_poison_turns > 0:
+			p_text += " (毒:%d)" % player_poison_turns
 		player_hp_label.text = p_text
 	
 	# 更新手牌顯示
@@ -78,8 +76,8 @@ func update_ui(player_hp: int, p_max: int, enemy_data: Dictionary, item_cards_da
 		enemy_hp_bar.max_value = enemy_data.max_hp
 		enemy_hp_bar.value = enemy_data.hp
 		var e_text = "HP: %d / %d" % [enemy_data.hp, enemy_data.max_hp]
-		if cm and cm.enemy_poison_turns > 0:
-			e_text += " (毒:%d)" % cm.enemy_poison_turns
+		if enemy_poison_turns > 0:
+			e_text += " (毒:%d)" % enemy_poison_turns
 		enemy_hp_label.text = e_text
 	enemy_name_label.text = enemy_data.name
 	enemy_sprite.texture = enemy_data.icon
@@ -92,9 +90,8 @@ func update_ui(player_hp: int, p_max: int, enemy_data: Dictionary, item_cards_da
 			item_card_widgets[i].setup(i, item_cards_data[i], i == target_item_idx)
 			
 	# 更新中毒粒子特效
-	if cm:
-		_update_poison_particles(true, cm.player_poison_turns)
-		_update_poison_particles(false, cm.enemy_poison_turns)
+	_update_poison_particles(true, player_poison_turns)
+	_update_poison_particles(false, enemy_poison_turns)
 
 func _rebuild_item_card_widgets(item_cards_data: Array, target_item_idx: int):
 	for child in item_card_container.get_children():

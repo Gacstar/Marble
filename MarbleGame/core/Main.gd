@@ -170,8 +170,8 @@ func _on_surrender_clicked():
 func _on_launch_status_changed(is_launched: bool):
 	combat_manager.is_selection_locked = is_launched
 
-func _on_combat_updated(p_hp, p_max, active_enemy, item_cards, t_idx, mult):
-	combat_ui.update_ui(p_hp, p_max, active_enemy, item_cards, t_idx, mult, is_playing_animation)
+func _on_combat_updated(p_hp, p_max, active_enemy, item_cards, t_idx, mult, p_poison_turns, e_poison_turns):
+	combat_ui.update_ui(p_hp, p_max, active_enemy, item_cards, t_idx, mult, p_poison_turns, e_poison_turns, is_playing_animation)
 
 func _on_enemy_attacked(m_name, dmg):
 	combat_ui.show_damage_effect(m_name, dmg)

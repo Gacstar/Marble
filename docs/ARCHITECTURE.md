@@ -22,10 +22,29 @@ tags: [type/architecture, module/shader-perspective, module/combat-system, modul
 - **`CombatUI` (左右對稱介面):**
     - **左側 我方老奶奶 (`PlayerSide`)**：渲染大頭像、總血條與縱向手牌（`CardHand`）。
     - **右側 奧客敵方 (`EnemySide`)**：幾何鏡像渲染大頭像、總血條與縱向道具卡（`ItemCardContainer`）。
-- **`CombatManager` (邏輯核心):** 管理雙向 HP 狀態與卡牌 CD/凍結，以及中毒（Poison）異常狀態與 Tick 回合扣血。接收來自彈珠台的 `slot_hit` 得分信號，進行即時戰鬥演算，並產生包含完整生命與傷害轉變資訊（包含中毒造成的扣血）的戰鬥收據。
-- **`SkillDirector` (演出與時序導演):** 掛載於 `CombatUI` 下的非同步動畫管理模組。透過協程（`await`）調度投擲物飛行、角色受擊抖動與閃紅、浮動數字飄字，以及血條平滑的 Tween 緩動，實現狀態結算與時序表演的優雅解耦。
+- **`CombatManager` (邏輯核心 - Model):** 管理雙向 HP 狀態與卡牌 CD/凍結，以及中毒（Poison）異常狀態與 Tick 回合扣血。接收來自彈珠台的 `slot_hit` 得分信號，進行即時戰鬥演算，並產生包含完整生命與傷害轉變資訊（包含中毒造成的扣血）的戰鬥收據。嚴禁直接引用或修改 UI 節點。
+- **`SkillDirector` (演出與時序導演 - View):** 掛載於 `CombatUI` 下的非同步動畫管理模組。透過協程（`await`）調度投擲物飛行、角色受擊抖動與閃紅、浮動數字飄字，以及血條平滑的 Tween 緩動，實現狀態結算與時序表演的優雅解耦。
+- **`Main.gd` (調度中介者 - Presenter / Coordinator):** 作為中樞，負責監聽 View 的信號、呼叫 Model 計算，並在獲得戰鬥收據後協調 View（動畫演出、UI 更新、彈珠清理）。
 
-## 3. 2D 物理動態與槽位發光
+## 3. MVP 架構規範 (MVP Architecture Guidelines)
+本專案嚴格遵循 **MVP (Model-View-Presenter) 與信號中介模式**，後續開發與擴充必須遵守以下分層原則：
+
+1. **Model (資料與規則層 - `CombatManager`, `Resource`)**:
+   - **單一職責**：專注於數值計算、狀態管理、回合結算與規則判定。
+   - **絕對隔離**：絕對不直接依賴、查找或操作任何 View (UI/Sprite/Node2D) 節點。
+   - **數據輸出**：狀態變更一律透過 `Signal` 廣播，或透過「戰鬥收據 (Receipt Dictionary)」回傳純資料結構。
+2. **View (視圖與演出層 - `CombatUI`, `SkillDirector`, `MarbleTable`)**:
+   - **被動更新**：純粹負責介面佈局、材質色彩、動畫渲染與使用者操作捕捉。
+   - **禁止跨層直連**：**嚴禁使用 `get_parent().combat_manager` 等路徑直接讀寫 Model**。所有所需資料必須由 Presenter 透過方法參數（如 `update_ui(...)`）被動傳入。
+   - **事件冒泡**：使用者互動或物理碰撞事件一律使用 `Signal` 向上通知 Presenter。
+3. **Presenter / Coordinator (調度中介層 - `Main.gd`)**:
+   - **中樞連結**：負責連接 Model 與 View 的信號。
+   - **流程協調**：接收 View 事件 -> 呼叫 Model 演算 -> 取得 Receipt -> 指派 View 播放非同步演出 -> 完成狀態對齊。
+4. **通信鐵則 (Communication Rule)**:
+   - **向下呼叫 (Call Down)**：Presenter 直接調用 Model 與 View 的公開方法。
+   - **向上通知 (Signal Up)**：View 與 Model 一律透過 `Signal` 向上通知 Presenter。
+
+## 4. 2D 物理動態與槽位發光
 - **槽位指示發光**: 在 `ScoreZone.tscn` 槽位底部配置了 `Indicator`，其 Y 座標已從 Y=864 上移至 **Y=834**，以確保不會被 `SubViewport` 高度限制 (854px) 裁切。
 - **燈號顏色更新**: `Main.gd` 接取選牌變更後，會通過 `MarbleTable.update_slot_indicators(card)` 來動態調整這 8 個發光槽的顏色。
 

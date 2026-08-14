@@ -22,6 +22,10 @@ tags: [type/architecture, module/physics-box2d, module/combat-system, status/bug
     - **現象**: 點擊介面沒反應，控制台報錯 `signal signature mismatch`。
     - **原因**: 修改了核心信號（如 `combat_updated`）的參數數量，但忘記更新 `Main.gd`。
     - **對策**: 修改 API 時強制執行 `handover-protocol` 檢查 `docs/API_SPEC.md`。
+- **[陷阱] View 跨層直連 Model (View-Model Tight Coupling)**:
+    - **現象**: UI 元件直接使用 `get_parent().combat_manager` 讀寫狀態，導致元件難以獨立維護、測試或更換場景結構。
+    - **原因**: 為了圖方便省略了 Presenter 參數傳遞或信號定義。
+    - **對策**: 嚴格遵守 MVP 分層規範。View 必須是被動渲染，所需資料必須由 `Main.gd` (Presenter) 經由方法參數傳入，使用者操作一律以 `Signal` 向上冒泡。
 
 ## 3. GDScript 資源管理
 - **[陷阱] 型別陣列賦值失效**:

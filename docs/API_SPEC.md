@@ -15,7 +15,7 @@ tags: [type/api-spec, module/combat-system, module/card-hand, module/physics-box
 - `slot_counts`: Array[int]，長度為 8 的陣列，儲存每個得分槽當前已累積的彈珠數。
 
 ### 信號 (Signals)
-- `combat_updated(player_hp, player_max_hp, active_enemy, item_cards, target_item_idx, next_damage_multiplier)`: 同步對稱戰鬥數據。
+- `combat_updated(player_hp, player_max_hp, active_enemy, item_cards, target_item_idx, next_damage_multiplier, player_poison_turns, enemy_poison_turns)`: 同步對稱戰鬥數據與中毒狀態。
 - `enemy_attacked(enemy_name, damage)`: 奧客道具卡發動攻擊。
 - `enemy_defeated(enemy_name)`: 奧客被擊敗死亡。
 - `enemy_selection_changed(idx)`: 目標道具卡切換。

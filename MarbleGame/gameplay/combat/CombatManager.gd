@@ -1,6 +1,6 @@
 extends Node
 
-signal combat_updated(player_hp, player_max_hp, active_enemy, item_cards, target_item_idx, next_damage_multiplier)
+signal combat_updated(player_hp, player_max_hp, active_enemy, item_cards, target_item_idx, next_damage_multiplier, player_poison_turns, enemy_poison_turns)
 signal enemy_attacked(enemy_name, damage)
 signal enemy_defeated(enemy_name)
 signal hand_initialized(hand)
@@ -246,4 +246,4 @@ func enemy_turn_tick() -> Array:
 	return attacks
 
 func emit_combat_signal():
-	combat_updated.emit(player_hp, player_max_hp, active_enemy, item_cards, target_item_idx, next_damage_multiplier)
+	combat_updated.emit(player_hp, player_max_hp, active_enemy, item_cards, target_item_idx, next_damage_multiplier, player_poison_turns, enemy_poison_turns)
